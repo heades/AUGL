@@ -31,9 +31,11 @@ and we thought it best to split the library.
 
 - License
 
-This library is currently provided under the MIT License, see LICENSE.txt.
+  This library is currently provided under the MIT License, see
+  LICENSE.txt.
 
 - Documentation
 
-There is no formal documentation currently, besides comments in the files.
+  There is no formal documentation currently, besides comments in the
+  files.
 
