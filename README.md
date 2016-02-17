@@ -37,6 +37,3 @@ This library is currently provided under the MIT License, see LICENSE.txt.
 
 There is no formal documentation currently, besides comments in the files.
 
-Much of the library is described in my book, "Verified Functional
-Programming in Agda", to be published 2016 with ACM Books.
-
