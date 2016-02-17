@@ -29,11 +29,11 @@ and we thought it best to split the library.
   imports from lib.agda (this is the main entry point for the
   library).
 
-6. License
+- License
 
 This library is currently provided under the MIT License, see LICENSE.txt.
 
-7. Documentation
+- Documentation
 
 There is no formal documentation currently, besides comments in the files.
 
