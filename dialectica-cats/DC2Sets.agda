@@ -278,38 +278,20 @@ cur-uncur-bij₂ {U , X , α}{V , Y , β}{W , Z , γ}{g , G , p₁} = (ext-set a
   ... | i , I = refl
   aux' : {u : U}{r : Σ V (λ x → Z)} → G u (fst r , snd r) ≡ G u r
   aux' {u}{v , z} = refl
-{-
+
+
 -- The of-course exponential:
-!ₒ-cond : ∀{U X : Set}
-  → (U → X → Set)
-  → U
-  → (U → X *)
-  → Set
-!ₒ-cond α u f = all-pred (α u) (f u)
+!ₒ-cond : ∀{U X : Set} → (α : U → X → Set) → U → 𝕃 X → Set  
+!ₒ-cond {U}{X} α u [] = ⊤
+!ₒ-cond {U}{X} α u (x :: xs) = (α u x) × (!ₒ-cond α u xs)
    
 !ₒ : Obj → Obj
-!ₒ (U , X , α) = U , (U → X *) , !ₒ-cond α
-
-!-cta : {V Y U X : Set}
-  → (Y → X)
-  → (U → V)
-  → (V → Y *)
-  → (U → X *)
-!-cta F f g = λ u → list-funct F (g (f u))
-
-!ₐ-cond : ∀{U V Y X : Set}{F : Y → X}{f : U → V}
-  → (α : U → X → Set)
-  → (β : V → Y → Set)
-  → (p : {u : U} {y : Y} → α u (F y) → β (f u) y)
-    {u : U}{l : Y *}
-  → all-pred (α u) (list-funct F l)
-  → all-pred (β (f u)) l
-!ₐ-cond _ _ _ {l = []} _ = triv
-!ₐ-cond α β p {u}{x :: xs} (p' , p'') = p p' , !ₐ-cond α β p p''     
+!ₒ (U , X , α) = U ,  X * , !ₒ-cond α
       
 !ₐ : {A B : Obj} → Hom A B → Hom (!ₒ A) (!ₒ B)
 !ₐ {U , X , α}{V , Y , β} (f , F , p) = f , !-cta F f , !ₐ-cond α β p
 
+{-
 -- Of-course is a comonad:
 ε : ∀{A} → Hom (!ₒ A) A
 ε {U , X , α} = id-set , (λ x y → [ x ]) , fst
