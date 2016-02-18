@@ -284,55 +284,57 @@ cur-uncur-bij₂ {U , X , α}{V , Y , β}{W , Z , γ}{g , G , p₁} = (ext-set a
 !ₒ-cond : ∀{U X : Set} → (α : U → X → Set) → U → 𝕃 X → Set  
 !ₒ-cond {U}{X} α u [] = ⊤
 !ₒ-cond {U}{X} α u (x :: xs) = (α u x) × (!ₒ-cond α u xs)
-   
+
+!ₒ-cond-++ : ∀{U X : Set}{α : U → X → Set}{u : U}{l₁ l₂ : 𝕃 X}
+  → !ₒ-cond α u (l₁ ++ l₂) ≡ ((!ₒ-cond α u l₁) × (!ₒ-cond α u l₂))
+!ₒ-cond-++ {U}{X}{α}{u}{[]}{l₂} = ∧-unit
+!ₒ-cond-++ {U}{X}{α}{u}{x :: xs}{l₂} rewrite !ₒ-cond-++ {U}{X}{α}{u}{xs}{l₂} = ∧-assoc
+
 !ₒ : Obj → Obj
 !ₒ (U , X , α) = U ,  X * , !ₒ-cond α
-      
-!ₐ : {A B : Obj} → Hom A B → Hom (!ₒ A) (!ₒ B)
-!ₐ {U , X , α}{V , Y , β} (f , F , p) = f , !-cta F f , !ₐ-cond α β p
 
-{-
+!ₐ-s : ∀{U Y X : Set}
+  → (U → Y → X)
+  → (U → Y * → X *)
+!ₐ-s f u [] = []
+!ₐ-s f u (y :: ys) = f u y :: !ₐ-s f u ys       
+
+!ₐ : {A B : Obj} → Hom A B → Hom (!ₒ A) (!ₒ B)
+!ₐ {U , X , α}{V , Y , β} (f , F , p) = f , (!ₐ-s F , aux)
+ where
+   aux : {u : U} {y : 𝕃 Y} → !ₒ-cond α u (!ₐ-s F u y) → !ₒ-cond β (f u) y
+   aux {u}{[]} p₁ = triv
+   aux {u}{y :: ys} (p₁ , p₂) = p p₁ , aux p₂
+
 -- Of-course is a comonad:
 ε : ∀{A} → Hom (!ₒ A) A
-ε {U , X , α} = id-set , (λ x y → [ x ]) , fst
+ε {U , X , α} = id-set , (λ u x → [ x ]) , fst
 
-δ-cta : {U X : Set} → (U → 𝕃 (U → 𝕃 X)) → U → 𝕃 X
-δ-cta g u = foldr (λ f rest → (f u) ++ rest) [] (g u)
+δ-s : {U X : Set} → U → 𝕃 (𝕃 X) → 𝕃 X
+δ-s u xs = foldr _++_ [] xs
   
 δ : ∀{A} → Hom (!ₒ A) (!ₒ (!ₒ A))
-δ {U , X , α} = id-set , δ-cta , δ-cond
-  where
-   δ-cond : {u : U} {l : 𝕃 (U → 𝕃 X)}
-     → all-pred (α u) (foldr (λ f → _++_ (f u)) [] l)
-     → all-pred (λ f
-     → all-pred (α u) (f u)) l
-   δ-cond {l = []} _ = triv
-   δ-cond {u}{l = x :: l'} p with
-     all-pred-append {X}{α u}
-                     {x u}
-                     {foldr (λ f → _++_ (f u)) [] l'}
-                     ∧-unit ∧-assoc
-   ... | p' rewrite p' = fst p , δ-cond {u} {l'} (snd p)
+δ {U , X , α} = id-set , δ-s , cond
+ where
+   cond : {u : U} {y : 𝕃 (𝕃 X)} → !ₒ-cond α u (foldr _++_ [] y) → !ₒ-cond (!ₒ-cond α) u y
+   cond {u}{[]} p = triv
+   cond {u}{l :: ls} p with !ₒ-cond-++ {U}{X}{α}{u}{l}{foldr _++_ [] ls}
+   ... | p' rewrite p' with p
+   ... | p₂ , p₃ = p₂ , cond {u}{ls} p₃    
+
 
 -- These diagrams can be found on page 22 of the report.
 comonand-diag₁ : ∀{A}
   → (δ {A}) ○ (!ₐ (δ {A})) ≡h (δ {A}) ○ (δ { !ₒ A})
-comonand-diag₁ {U , X , α} =
-  refl , ext-set (λ {a} → ext-set (λ {a₁} → aux {a₁}{a a₁}))
+comonand-diag₁ {U , X , α} = refl , ext-set (λ {x} → ext-set (λ {l} → aux {x} {l}))
  where
-   aux : ∀{a₁ : U}{l : 𝕃 (U → 𝕃 (U → 𝕃 X))} →
-      foldr (λ f → _++_ (f a₁)) []
-      (map (λ g u → foldr (λ f → _++_ (f u)) [] (g u)) l)
-      ≡
-      foldr (λ f → _++_ (f a₁)) [] (foldr (λ f → _++_ (f a₁)) [] l)
-   aux {a}{[]} = refl  
-   aux {a}{x :: l} rewrite
-     sym (foldr-append {l₁ = x a}{foldr (λ f → _++_ (f a)) [] l}{a})
-     = cong2 {a = foldr (λ f → _++_ (f a)) [] (x a)}
-             _++_
-             refl
-             (aux {a}{l})
+  aux : ∀{x : U}{l : 𝕃 (𝕃 (𝕃 X))}
+    → foldr _++_ [] (!ₐ-s (λ u xs
+    → foldr _++_ [] xs) x l) ≡ foldr _++_ [] (foldr _++_ [] l)
+  aux {u}{[]} = refl
+  aux {u}{x :: xs} rewrite aux {u}{xs} = foldr-append {_}{_}{X}{X}{x}{foldr _++_ [] xs}
 
+{-
 comonand-diag₂ : ∀{A}
   → (δ {A}) ○ (ε { !ₒ A}) ≡h (δ {A}) ○ (!ₐ (ε {A}))
 comonand-diag₂ {U , X , α} =
