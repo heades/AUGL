@@ -193,25 +193,30 @@ Fα {V}{W}{X}{Y}{U}{Z} ((u , v) , w) (x , (y , z)) = (x , y) , z
     where
       aux'' : {a : Σ X (λ x → Σ Y (λ x₁ → Z))} → Fα-inv (u , v , w) (Fα ((u , v) , w) a) ≡ a
       aux'' {x , (y , z)} = refl
-{-       
+       
 -- Internal hom:
-⊸-cond : ∀{U V X Y : Set} → (U → X → Set) → (V → Y → Set) → (U → V) × (Y → X) → U × Y → Set
-⊸-cond α β (f , g) (u , y) = α u (g y) → β (f u) y
+⊸-cond : ∀{U V X Y : Set}{α : U → X → Set}{β : V → Y → Set}
+  → Σ (U → V) (λ x → U → Y → X)
+  → Σ U (λ x → Y)
+  → Set
+⊸-cond {α = α}{β} (f , F) (u , y) = α u (F u y) → β (f u) y
 
 _⊸ₒ_ : Obj → Obj → Obj
-(U , X , α) ⊸ₒ (V , Y , β) = ((U → V) × (Y → X)) , (U × Y) , ⊸-cond α β
+(U , X , α) ⊸ₒ (V , Y , β) = ((U → V) × (U → Y → X)) , ((U × Y) , ⊸-cond {α = α}{β})
+
 
 _⊸ₐ_ : {A B C D : Obj} → Hom C A → Hom B D → Hom (A ⊸ₒ B) (C ⊸ₒ D)
 _⊸ₐ_ {(U , X , α)}{(V , Y , β)}{(W , Z , γ)}{(S , T , δ)} (f , F , p₁) (g , G , p₂) =
-  h , H , p₃
-  where
-   h : Σ (U → V) (λ x → Y → X) → Σ (W → S) (λ x → T → Z)
-   h (h₁ , h₂) = (λ w → g (h₁ (f w))) , (λ t → F (h₂ (G t)))
-   H : Σ W (λ x → T) → Σ U (λ x → Y)
-   H (w , t) = f w , G t
-   p₃ : {u : Σ (U → V) (λ x → Y → X)} {y : Σ W (λ x → T)} → ⊸-cond α β u (H y) → ⊸-cond γ δ (h u) y
-   p₃ {h₁ , h₂}{w , t} c c' = p₂ (c (p₁ c'))
+  h , H , cond
+ where
+  h : Σ (U → V) (λ x → U → Y → X) → Σ (W → S) (λ x → W → T → Z)
+  h (i , I) = (λ w → g (i (f w))) , (λ w t → F w (I (f w) (G (i (f w)) t)))
+  H : Σ (U → V) (λ x → U → Y → X) → Σ W (λ x → T) → Σ U (λ x → Y)
+  H (i , I) (w , t) = f w , G (i (f w)) t
+  cond : {u : Σ (U → V) (λ x → U → Y → X)} {y : Σ W (λ x → T)} → ⊸-cond {α = α}{β} u (H u y) → ⊸-cond {α = γ}{δ} (h u) y
+  cond {i , I}{w , y} p₃ p₄ = p₂ (p₃ (p₁ p₄))
 
+{-
 cur : {A B C : Obj}
   → Hom (A ⊗ₒ B) C
   → Hom A (B ⊸ₒ C)
