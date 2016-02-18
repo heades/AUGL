@@ -43,6 +43,14 @@ fst (a , b) = a
 snd : ∀ {ℓ ℓ'} {A : Set ℓ} {B : Set ℓ'} → A × B → B
 snd (a , b) = b
 
+trans-× : ∀{ℓ₁ ℓ₂ ℓ₃}
+         {A : Set ℓ₁}{B : Set ℓ₂}
+         {C : Set ℓ₃}
+       → (C → A)
+       → (C → B)
+       → (C → A × B)
+trans-× f g c = f c , g c
+
 ⟨_,_⟩ : ∀{ℓ₁ ℓ₂ ℓ₃ ℓ₄}
          {A : Set ℓ₁}{B : Set ℓ₂}
          {C : Set ℓ₃}{D : Set ℓ₄}
