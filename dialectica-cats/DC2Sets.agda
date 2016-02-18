@@ -100,7 +100,7 @@ _⊗ₐ_ {(U , X , α)}{(V , Y , β)}{(W , Z , γ)}{(S , T , δ)} (f , F , p₁)
   p⊗ : {u : Σ U (λ x → V)} {y : Σ Z (λ x → T)} → (α ⊗ᵣ β) u (F⊗ {F = F}{G} u y) → (γ ⊗ᵣ δ) (⟨ f , g ⟩ u) y
   p⊗ {u , v}{z , t} (p₃ , p₄) = p₁  p₃ , p₂ p₄
 
-{-
+
 -- The unit for tensor:
 ι : ⊤ → ⊤ → Set
 ι triv triv = ⊤
@@ -111,63 +111,65 @@ I = (⊤ , ⊤ , ι)
 J : Obj
 J = (⊤ , ⊤ , (λ x y → ⊥))
 
+
 -- The left-unitor:
-λ⊗-p : ∀{U X α}{u : ⊤ × U} {x : X} → (ι ⊗ᵣ α) u ((λ _ → triv) , (λ _ → x)) → α (snd u) x
-λ⊗-p {U}{X}{α}{(triv , u)}{x} (triv , p-α) = p-α
+λ⊗-p : ∀{U X α}{u : Σ ⊤ (λ x → U)} {y : X} → (ι ⊗ᵣ α) u (triv , y) → α (snd u) y
+λ⊗-p {U}{X}{α}{(triv , u)}{x} = snd
    
 λ⊗ : ∀{A : Obj} → Hom (I ⊗ₒ A) A
-λ⊗ {(U , X , α)} = snd , (λ x → (λ _ → triv) , (λ _ → x)) , λ⊗-p
+λ⊗ {(U , X , α)} = snd , (λ _ x → triv , x) , λ⊗-p
 
-λ⁻¹⊗ : ∀{A : Obj} → Hom A (I ⊗ₒ A)
-λ⁻¹⊗ {(U , X , α)} = (λ u → triv , u) , ((λ x → snd x triv) , λ⁻¹⊗-p)  
+λ⊗-inv : ∀{A : Obj} → Hom A (I ⊗ₒ A)
+λ⊗-inv {(U , X , α)} = (λ u → triv , u) , (λ _ r → snd r) , λ⊗-inv-p
  where
-  λ⁻¹⊗-p : ∀{U X α} → {u : U} {y : (U → ⊤) × (⊤ → X)} → α u (snd y triv) → (ι ⊗ᵣ α) (triv , u) y
-  λ⁻¹⊗-p {U}{X}{α}{u}{(h₁ , h₂)} p-α with h₁ u
-  ... | triv = triv , p-α
+  λ⊗-inv-p : ∀{U X α}{u : U} {y : Σ ⊤ (λ x → X)} → α u (snd y) → (ι ⊗ᵣ α) (triv , u) y
+  λ⊗-inv-p {U}{X}{α}{u}{triv , x} p = triv , p
 
 -- The right-unitor:
 ρ⊗ : ∀{A : Obj} → Hom (A ⊗ₒ I) A
-ρ⊗ {(U , X , α)} = fst , (λ x → (λ x₁ → x) , (λ x₁ → triv)) , ρ⊗-p
+ρ⊗ {(U , X , α)} = fst , (λ r x → x , triv) , ρ⊗-p
  where
-  ρ⊗-p : ∀{U X α}{u : U × ⊤}{x : X} → (α ⊗ᵣ ι) u ((λ _ → x) , (λ _ → triv)) → α (fst u) x
-  ρ⊗-p {U}{X}{α}{(u , triv)}{x} (p-α , triv) = p-α
+  ρ⊗-p : ∀{U X α}{u : Σ U (λ x → ⊤)} {y : X} → (α ⊗ᵣ ι) u (y , triv) → α (fst u) y
+  ρ⊗-p {U}{X}{α}{(u , _)}{x} (p , _) = p
+
 
 ρ⊗-inv : ∀{A : Obj} → Hom A (A ⊗ₒ I)
-ρ⊗-inv {(U , X , α)} = (λ x → x , triv) , (λ x → fst x triv) , ρ⊗-p-inv
+ρ⊗-inv {(U , X , α)} = (λ u → u , triv) , (λ u r → fst r) , ρ⊗-p-inv
  where
-  ρ⊗-p-inv : ∀{U X α}{u : U} {y : Σ (⊤ → X) (λ x → U → ⊤)} → α u (fst y triv) → (α ⊗ᵣ ι) (u , triv) y
-  ρ⊗-p-inv {U}{X}{α}{u}{(f , g)} p-α rewrite single-range {g = g}{u} = p-α , triv
+  ρ⊗-p-inv : ∀{U X α}{u : U} {y : Σ X (λ x → ⊤)} → α u (fst y) → (α ⊗ᵣ ι) (u , triv) y
+  ρ⊗-p-inv {U}{X}{α}{u}{x , triv} p = p , triv
 
 -- Symmetry:
 β⊗ : ∀{A B : Obj} → Hom (A ⊗ₒ B) (B ⊗ₒ A)
-β⊗ {(U , X , α)}{(V , Y , β)} = twist-× , twist-× , β⊗-p
+β⊗ {(U , X , α)}{(V , Y , β)} = twist-× , (λ r₁ r₂ → twist-× r₂) , β⊗-p
  where
-   β⊗-p : ∀{U V Y X α β} → {u : U × V} {y : (U → Y) × (V → X)} →
-       (α ⊗ᵣ β) u (twist-× y) → (β ⊗ᵣ α) (twist-× u) y
-   β⊗-p {U}{V}{Y}{X}{α}{β}{(u , v)}{(h₁ , h₂)} p-α = twist-× p-α
+   β⊗-p : ∀{U V Y X α β}{u : Σ U (λ x → V)} {y : Σ Y (λ x → X)} → (α ⊗ᵣ β) u (twist-× y) → (β ⊗ᵣ α) (twist-× u) y
+   β⊗-p {U}{V}{Y}{X}{α}{β}{u , v}{y , x} = twist-×
+
 
 -- The associator:
 α⊗-inv : ∀{A B C : Obj} → Hom (A ⊗ₒ (B ⊗ₒ C)) ((A ⊗ₒ B) ⊗ₒ C)
 α⊗-inv {(U , X , α)}{(V , Y , β)}{(W , Z , γ)} = rl-assoc-× , Fα-inv , α-inv-cond
  where
-   Fα-inv : (W → (V → X) × (U → Y)) × (U × V → Z) → (V × W → X) × (U → (W → Y) × (V → Z))
-   Fα-inv = (λ p → (λ p' → fst ((fst p) (snd p')) (fst p')) , (λ u → (λ w → snd (fst p w) u) , (λ v → (snd p) (u , v))))
-   α-inv-cond : ∀{u : U × V × W} {y : (W → (V → X) × (U → Y)) × (U × V → Z)} → (α ⊗ᵣ (β ⊗ᵣ γ)) u (Fα-inv y) → ((α ⊗ᵣ β) ⊗ᵣ γ) (rl-assoc-× u) y
-   α-inv-cond {(u , v , w)} {(h₁ , h₂)} (p₁ , p₂ , p₃) with h₁ w
-   ... | (a , b) = (p₁ , p₂) , p₃
+   Fα-inv : (U × (V × W)) → ((X × Y) × Z) → (X × (Y × Z))
+   Fα-inv (u , (v , w)) ((x , y) , z) = x , y , z
+   α-inv-cond : {u : Σ U (λ x → Σ V (λ x₁ → W))}{y : Σ (Σ X (λ x → Y)) (λ x → Z)}
+     → (α ⊗ᵣ (β ⊗ᵣ γ)) u (Fα-inv u y)
+     → ((α ⊗ᵣ β) ⊗ᵣ γ) (rl-assoc-× u) y
+   α-inv-cond {u , (v , w)}{(x , y) , z} (p₁ , (p₂ , p₃)) = (p₁ , p₂) , p₃
 
-Fα : ∀{V W X Y U V Z : Set} → Σ (Σ V (λ x → W) → X) (λ x → U → Σ (W → Y) (λ x₁ → V → Z))
-       → Σ (W → Σ (V → X) (λ x → U → Y)) (λ x → Σ U (λ x₁ → V) → Z)
-Fα (f ,  g) = (λ x → (λ x₁ → f ((x₁ , x))) , (λ x₁ → fst (g x₁) x)) , (λ x → snd (g (fst x)) (snd x))
+
+Fα : ∀{V W X Y U Z : Set} → ((U × V) × W) → (X × (Y × Z)) → ((X × Y) × Z)
+Fα {V}{W}{X}{Y}{U}{Z} ((u , v) , w) (x , (y , z)) = (x , y) , z
 
 α⊗ : ∀{A B C : Obj} → Hom ((A ⊗ₒ B) ⊗ₒ C) (A ⊗ₒ (B ⊗ₒ C)) 
-α⊗ {(U , X , α)}{(V , Y , β)}{(W , Z , γ)} = (lr-assoc-× , Fα {V} , α-cond)
+α⊗ {(U , X , α)}{(V , Y , β)}{(W , Z , γ)} = (lr-assoc-× , Fα , α-cond)
  where
-  α-cond : {u : Σ (Σ U (λ x → V)) (λ x → W)}{y : Σ (Σ V (λ x → W) → X) (λ x → U → Σ (W → Y) (λ x₁ → V → Z))} →
-      ((α ⊗ᵣ β) ⊗ᵣ γ) u (Fα {V} y) → (α ⊗ᵣ (β ⊗ᵣ γ)) (lr-assoc-× u) y
-  α-cond {(u , v) , w}{(f , g)} ((p₁ , p₂) , p₃) with g u
-  ... | (h₁ , h₂) = p₁ , p₂ , p₃
-
+  α-cond : {u : Σ (Σ U (λ x → V)) (λ x → W)}
+      {y : Σ X (λ x → Σ Y (λ x₁ → Z))} →
+      ((α ⊗ᵣ β) ⊗ᵣ γ) u (Fα u y) → (α ⊗ᵣ (β ⊗ᵣ γ)) (lr-assoc-× u) y
+  α-cond {(u , v) , w}{x , (y , z)} ((p₁ , p₂) , p₃) = p₁ , p₂ , p₃
+{-
 α⊗-id₁ : ∀{A B C} → (α⊗ {A}{B}{C}) ○ α⊗-inv ≡h id
 α⊗-id₁ {U , X , α}{V , Y , β}{W , Z , γ} = ext-set aux , ext-set aux'
  where
