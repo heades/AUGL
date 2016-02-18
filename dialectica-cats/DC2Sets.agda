@@ -216,19 +216,19 @@ _⊸ₐ_ {(U , X , α)}{(V , Y , β)}{(W , Z , γ)}{(S , T , δ)} (f , F , p₁)
   cond : {u : Σ (U → V) (λ x → U → Y → X)} {y : Σ W (λ x → T)} → ⊸-cond {α = α}{β} u (H u y) → ⊸-cond {α = γ}{δ} (h u) y
   cond {i , I}{w , y} p₃ p₄ = p₂ (p₃ (p₁ p₄))
 
-{-
 cur : {A B C : Obj}
   → Hom (A ⊗ₒ B) C
   → Hom A (B ⊸ₒ C)
 cur {U , X , α}{V , Y , β}{W , Z , γ} (f , F , p₁)
-  = (λ u → (λ v → f (u , v)) , (λ z → snd (F z) u)) , (λ p →  fst (F (snd p)) (fst p)) , cur-cond
+  = (λ u → (λ v → f (u , v)) , (λ v z → snd (F (u , v) z))) , (λ u r → fst (F (u , (fst r)) (snd r))) , cond 
  where
-   cur-cond : ∀{u : U}{y : Σ V (λ x → Z)}
-     → α u (fst (F (snd y)) (fst y))
-     → ⊸-cond β γ ((λ v → f (u , v)) , (λ z → snd (F z) u)) y
-   cur-cond {u}{v , z} p₂ p₃ with p₁ {u , v}{z} 
-   ... | p₁' with F z
-   ... | (j₁ , j₂) = p₁' (p₂ , p₃)
+   cond : {u : U} {y : Σ V (λ x → Z)}
+     → α u (fst (F (u , fst y) (snd y)))
+     → ⊸-cond {α = β}{γ} ((λ v → f (u , v)) , (λ v z → snd (F (u , v) z))) y   
+   cond {u}{v , z} p₂ p₃ with (p₁ {u , v}{z})
+   ... | p₄ with F (u , v) z
+   ... | (x , y) = p₄ (p₂ , p₃)
+   
 
 cur-≡h : ∀{A B C}{f₁ f₂ : Hom (A ⊗ₒ B) C}
   → f₁ ≡h f₂
@@ -240,6 +240,7 @@ cur-≡h {U , X , α}{V , Y , β}{W , Z , γ}
 cur-cong : ∀{A B C}{f₁ f₂ : Hom (A ⊗ₒ B) C} → f₁ ≡h f₂ → cur f₁ ≡h cur f₂
 cur-cong {(U , X , α)} {(V , Y , β)} {(W , Z , γ)}{f₁ , F₁ , _}{f₂ , F₂ , _} (p₁ , p₂) rewrite p₁ | p₂ = refl , refl
 
+{-
 uncur : {A B C : Obj}
   → Hom A (B ⊸ₒ C)
   → Hom (A ⊗ₒ B) C
