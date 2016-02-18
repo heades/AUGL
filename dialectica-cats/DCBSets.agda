@@ -118,3 +118,17 @@ _⊗ₐ_ {(U , X , _ , _ , α)}{(V , Y , _ , _ , β)}{(W , Z , _ , _ , γ)}{(S ,
   cond : {u : Σ U (λ x → V)} {y : Y} → (α ⊗ᵣ β) u (n₁ triv , y) → β (snd u) y
   cond {u , v}{y} (p₁ , p₂) = p₂
 
+cart-ar : {U X V Y W Z : Set}
+  → {α : U → X → Set}
+  → {β : V → Y → Set}
+  → {γ : W → Z → Set}
+  → {m₁ : ⊤ → U}
+  → {n₁ : ⊤ → X}
+  → {m₂ : ⊤ → V}
+  → {n₂ : ⊤ → Y}
+  → {m₃ : ⊤ → W}
+  → {n₃ : ⊤ → Z}      
+  → Hom (W , Z , m₃ , n₃ , γ) (U , X , m₁ , n₁ , α)
+  → Hom (W , Z , m₃ , n₃ , γ) (V , Y , m₂ , n₂ , β)
+  → Hom (W , Z , m₃ , n₃ , γ) ((U , X , m₁ , n₁ , α) ⊗ₒ (V , Y , m₂ , n₂ , β))
+cart-ar {U}{X}{V}{Y}{W}{Z}{α}{β}{γ}{m₁}{n₁}{m₂}{n₂}{m₃}{n₃} (f , F) (g , G) = trans-× f g , {!!} , {!!}
