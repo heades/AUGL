@@ -148,11 +148,12 @@ J = (⊤ , ⊤ , (λ x y → ⊥))
 
 
 -- The associator:
+Fα-inv : ∀{ℓ}{U V W X Y Z : Set ℓ} → (U × (V × W)) → ((X × Y) × Z) → (X × (Y × Z))
+Fα-inv (u , (v , w)) ((x , y) , z) = x , y , z
+   
 α⊗-inv : ∀{A B C : Obj} → Hom (A ⊗ₒ (B ⊗ₒ C)) ((A ⊗ₒ B) ⊗ₒ C)
 α⊗-inv {(U , X , α)}{(V , Y , β)}{(W , Z , γ)} = rl-assoc-× , Fα-inv , α-inv-cond
  where
-   Fα-inv : (U × (V × W)) → ((X × Y) × Z) → (X × (Y × Z))
-   Fα-inv (u , (v , w)) ((x , y) , z) = x , y , z
    α-inv-cond : {u : Σ U (λ x → Σ V (λ x₁ → W))}{y : Σ (Σ X (λ x → Y)) (λ x → Z)}
      → (α ⊗ᵣ (β ⊗ᵣ γ)) u (Fα-inv u y)
      → ((α ⊗ᵣ β) ⊗ᵣ γ) (rl-assoc-× u) y
@@ -169,42 +170,30 @@ Fα {V}{W}{X}{Y}{U}{Z} ((u , v) , w) (x , (y , z)) = (x , y) , z
       {y : Σ X (λ x → Σ Y (λ x₁ → Z))} →
       ((α ⊗ᵣ β) ⊗ᵣ γ) u (Fα u y) → (α ⊗ᵣ (β ⊗ᵣ γ)) (lr-assoc-× u) y
   α-cond {(u , v) , w}{x , (y , z)} ((p₁ , p₂) , p₃) = p₁ , p₂ , p₃
-{-
+
 α⊗-id₁ : ∀{A B C} → (α⊗ {A}{B}{C}) ○ α⊗-inv ≡h id
 α⊗-id₁ {U , X , α}{V , Y , β}{W , Z , γ} = ext-set aux , ext-set aux'
  where
    aux : {a : Σ (Σ U (λ x → V)) (λ x → W)} → rl-assoc-× (lr-assoc-× a) ≡ a
    aux {(u , v) , w} = refl
 
-   aux' : {a : Σ (W → Σ (V → X) (λ x → U → Y)) (λ x → Σ U (λ x₁ → V) → Z)}
-     → ((λ x → (λ x₁ → fst (fst a x) x₁) , (λ x₁ → snd (fst a x) x₁)) , (λ x → snd a (fst x , snd x))) ≡ a
-   aux' {j₁ , j₂} = eq-× (ext-set aux'') (ext-set aux''')
+   aux' : {a : Σ (Σ U (λ x → V)) (λ x → W)} → (λ z → Fα {V}{W}{X}{Y}{U}{Z} a (Fα-inv (lr-assoc-× a) z)) ≡ (λ y → y)
+   aux' {(u , v), w} = ext-set aux''
     where
-      aux'' : {a : W} → (fst (j₁ a) , snd (j₁ a)) ≡ j₁ a
-      aux'' {w} with j₁ w
-      ... | h₁ , h₂ = refl
-
-      aux''' : {a : Σ U (λ x₁ → V)} → j₂ (fst a , snd a) ≡ j₂ a
-      aux''' {u , v} = refl
+      aux'' : {a : Σ (Σ X (λ x → Y)) (λ x → Z)} → Fα ((u , v) , w) (Fα-inv (u , v , w) a) ≡ a
+      aux'' {(x , y) , z} = refl
 
 α⊗-id₂ : ∀{A B C} → (α⊗-inv {A}{B}{C}) ○ α⊗ ≡h id
 α⊗-id₂ {U , X , α}{V , Y , β}{W , Z , γ} = ext-set aux , ext-set aux'
  where
    aux : {a : Σ U (λ x → Σ V (λ x₁ → W))} → lr-assoc-× (rl-assoc-× a) ≡ a
    aux {u , (v , w)} = refl
-   aux' : {a
-       : Σ (Σ V (λ x → W) → X) (λ x → U → Σ (W → Y) (λ x₁ → V → Z))} →
-      ((λ p' → fst (fst (Fα {V} {W} {X} {Y} {U} {V} {Z} a) (snd p')) (fst p')) ,
-       (λ u → (λ w → snd (fst (Fα {V} {W} {X} {Y} {U} {V} {Z} a) w) u) , (λ v → snd (Fα {V} {W} {X} {Y} {U} {V} {Z} a) (u , v))))
-      ≡ a
-   aux' {j₁ , j₂} = eq-× (ext-set aux'') (ext-set aux''')
-     where
-       aux'' : {a : Σ V (λ x → W)} → j₁ (fst a , snd a) ≡ j₁ a
-       aux'' {v , w} = refl
-       aux''' : {a : U} → ((λ w → fst (j₂ a) w) , (λ v → snd (j₂ a) v)) ≡ j₂ a
-       aux''' {u} with j₂ u
-       ... | h₁ , h₂ = refl
-       
+   aux' : {a : Σ U (λ x → Σ V (λ x₁ → W))} → (λ z → Fα-inv {_}{U}{V}{W}{X}{Y}{Z} a (Fα (rl-assoc-× a) z)) ≡ (λ y → y)
+   aux' {u , (v , w)} = ext-set aux''
+    where
+      aux'' : {a : Σ X (λ x → Σ Y (λ x₁ → Z))} → Fα-inv (u , v , w) (Fα ((u , v) , w) a) ≡ a
+      aux'' {x , (y , z)} = refl
+{-       
 -- Internal hom:
 ⊸-cond : ∀{U V X Y : Set} → (U → X → Set) → (V → Y → Set) → (U → V) × (Y → X) → U × Y → Set
 ⊸-cond α β (f , g) (u , y) = α u (g y) → β (f u) y
