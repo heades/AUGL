@@ -104,3 +104,16 @@ _⊗ₐ_ {(U , X , _ , _ , α)}{(V , Y , _ , _ , β)}{(W , Z , _ , _ , γ)}{(S ,
  where
    cond : {u : Σ U (λ x → V)} {y : X} → (α ⊗ᵣ β) u (y , n₂ triv) → α (fst u) y
    cond {u , v}{x} (p₁ , p₂) = p₁
+
+π₂ : {U X V Y : Set}
+    → {α : U → X → Set}
+    → {β : V → Y → Set}
+    → {m₁ : ⊤ → U}
+    → {n₁ : ⊤ → X}
+    → {m₂ : ⊤ → V}
+    → {n₂ : ⊤ → Y}    
+    → Hom ((U , X , m₁ , n₁ , α) ⊗ₒ (V , Y , m₂ , n₂ , β)) (V , Y , m₂ , n₂ , β)
+π₂ {U}{X}{V}{Y}{α}{β}{m₁}{n₁}{m₂}{n₂} = snd , (λ r y → n₁ triv , y) , cond
+ where
+  cond : {u : Σ U (λ x → V)} {y : Y} → (α ⊗ᵣ β) u (n₁ triv , y) → β (snd u) y
+  cond {u , v}{y} (p₁ , p₂) = p₂
