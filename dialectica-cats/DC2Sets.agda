@@ -240,20 +240,26 @@ cur-≡h {U , X , α}{V , Y , β}{W , Z , γ}
 cur-cong : ∀{A B C}{f₁ f₂ : Hom (A ⊗ₒ B) C} → f₁ ≡h f₂ → cur f₁ ≡h cur f₂
 cur-cong {(U , X , α)} {(V , Y , β)} {(W , Z , γ)}{f₁ , F₁ , _}{f₂ , F₂ , _} (p₁ , p₂) rewrite p₁ | p₂ = refl , refl
 
-{-
+
 uncur : {A B C : Obj}
   → Hom A (B ⊸ₒ C)
   → Hom (A ⊗ₒ B) C
 uncur {U , X , α}{V , Y , β}{W , Z , γ} (f , F , p₁)
-  = (λ p → fst (f (fst p)) (snd p)) , (λ z → (λ v → F (v , z)) , (λ u → snd (f u) z)) , uncur-cond
+  = h , (H , cond)
   where
-    uncur-cond : ∀{u : Σ U (λ x → V)} {y : Z}
-      → (α ⊗ᵣ β) u ((λ v → F (v , y)) , (λ u₁ → snd (f u₁) y))
-      → γ (fst (f (fst u)) (snd u)) y
-    uncur-cond {u , v}{z} (p₂ , p₃) with p₁ {u}{v , z} p₂
-    ... | p₁' with f u
-    ... | (j₁ , j₂) = p₁' p₃
-
+  h : Σ U (λ x → V) → W
+  h (u , v) with f u
+  ... | i , I = i v
+  H : Σ U (λ x → V) → Z → Σ X (λ x → Y)
+  H (u , v) z with f u
+  ... | i , I = F u (v , z) , I v z
+  cond : {u : Σ U (λ x → V)} {z : Z} → (α ⊗ᵣ β) u (H u z) → γ (h u) z
+  cond {u , v}{z} r with (p₁ {u}{v , z})
+  ... | p₄ with f u
+  ... | i , I with r
+  ... | p₂ , p₃ = p₄ p₂ p₃
+  
+{-
 cur-uncur-bij₁ : ∀{A B C}{f : Hom (A ⊗ₒ B) C}
   → uncur (cur f) ≡h f
 cur-uncur-bij₁ {U , X , α}{V , Y , β}{W , Z , γ}{f , F , p₁} = ext-set aux₁ , ext-set aux₂
