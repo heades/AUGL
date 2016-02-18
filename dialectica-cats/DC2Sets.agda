@@ -296,8 +296,7 @@ cur-uncur-bij₂ {U , X , α}{V , Y , β}{W , Z , γ}{g , G , p₁} = (ext-set a
 !ₐ-s : ∀{U Y X : Set}
   → (U → Y → X)
   → (U → Y * → X *)
-!ₐ-s f u [] = []
-!ₐ-s f u (y :: ys) = f u y :: !ₐ-s f u ys       
+!ₐ-s f u l = map (f u) l
 
 !ₐ : {A B : Obj} → Hom A B → Hom (!ₒ A) (!ₒ B)
 !ₐ {U , X , α}{V , Y , β} (f , F , p) = f , (!ₐ-s F , aux)
@@ -322,8 +321,6 @@ cur-uncur-bij₂ {U , X , α}{V , Y , β}{W , Z , γ}{g , G , p₁} = (ext-set a
    ... | p' rewrite p' with p
    ... | p₂ , p₃ = p₂ , cond {u}{ls} p₃    
 
-
--- These diagrams can be found on page 22 of the report.
 comonand-diag₁ : ∀{A}
   → (δ {A}) ○ (!ₐ (δ {A})) ≡h (δ {A}) ○ (δ { !ₒ A})
 comonand-diag₁ {U , X , α} = refl , ext-set (λ {x} → ext-set (λ {l} → aux {x} {l}))
@@ -334,106 +331,16 @@ comonand-diag₁ {U , X , α} = refl , ext-set (λ {x} → ext-set (λ {l} → a
   aux {u}{[]} = refl
   aux {u}{x :: xs} rewrite aux {u}{xs} = foldr-append {_}{_}{X}{X}{x}{foldr _++_ [] xs}
 
-{-
+
+foldr-map : ∀{ℓ}{A : Set ℓ}{l : 𝕃 A} → l ≡ foldr _++_ [] (map (λ x₁ → x₁ :: []) l)
+foldr-map {_}{_}{[]} = refl
+foldr-map {ℓ}{A}{x :: xs} rewrite sym (foldr-map {ℓ}{A}{xs}) = refl
+
 comonand-diag₂ : ∀{A}
   → (δ {A}) ○ (ε { !ₒ A}) ≡h (δ {A}) ○ (!ₐ (ε {A}))
 comonand-diag₂ {U , X , α} =
-  refl , ext-set (λ {f} → ext-set (λ {a} → aux {a}{f a}))
- where
-  aux : ∀{a : U}{l : X *}
-    → l ++ [] ≡ foldr (λ f₁ → _++_ (f₁ a)) [] (map (λ x y → x :: []) l)
-  aux {a}{[]} = refl
-  aux {a}{x :: l} with aux {a}{l}
-  ... | IH rewrite ++[] l =
-    cong2 {a = x} {x} {l}
-          {foldr (λ f₁ → _++_ (f₁ a)) [] (map (λ x₁ y → x₁ :: []) l)} _::_ refl
-          IH
-          
-module Cartesian where
-  π₁ : {U X V Y : Set}
-    → {α : U → X → Set}
-    → {β : V → Y → Set}
-    → Hom ((!ₒ (U , X , α)) ⊗ₒ (!ₒ (V , Y , β))) (!ₒ (U , X , α))
-  π₁ {U}{X}{V}{Y}{α}{β} = fst , (λ f → (λ v u → f u) , (λ u v → [])) , π₁-cond
-    where
-      π₁-cond : ∀{u : Σ U (λ x → V)} {y : U → 𝕃 X} →
-        ((λ u₁ f → all-pred (α u₁) (f u₁)) ⊗ᵣ
-        (λ u₁ f → all-pred (β u₁) (f u₁)))
-        u ((λ v u₁ → y u₁) , (λ u₁ v → [])) →
-        all-pred (α (fst u)) (y (fst u))
-      π₁-cond {u , v}{f} (p₁ , p₂) = p₁
-
-  π₂ : {U X V Y : Set}
-      → {α : U → X → Set}
-      → {β : V → Y → Set}
-      → Hom ((!ₒ (U , X , α)) ⊗ₒ (!ₒ (V , Y , β))) (!ₒ (V , Y , β))
-  π₂ {U}{X}{V}{Y}{α}{β} = snd , (λ f → (λ v u → []) , (λ u v → f v)) , π₂-cond
-      where
-        π₂-cond : ∀{u : Σ U (λ x → V)} {y : V → 𝕃 Y} →
-          ((λ u₁ f → all-pred (α u₁) (f u₁)) ⊗ᵣ
-            (λ u₁ f → all-pred (β u₁) (f u₁)))
-              u ((λ v u₁ → []) , (λ u₁ v → y v)) →
-            all-pred (β (snd u)) (y (snd u))
-        π₂-cond {u , v}{f} (p₁ , p₂) = p₂
-
-  cart-ar-crt : {U X V Y W Z : Set}
-    → {α : U → X → Set}
-    → {β : V → Y → Set}
-    → {γ : W → Z → Set}
-    → Hom (!ₒ (W , Z , γ)) (!ₒ (U , X , α))
-    → Hom (!ₒ (W , Z , γ)) (!ₒ (V , Y , β))
-    → Σ (V → U → 𝕃 X) (λ x → U → V → 𝕃 Y) → W → 𝕃 Z
-  cart-ar-crt  (f , F , p₁) (g , G , p₂) (j₁ , j₂) w = F (j₁ (g w)) w ++ G (j₂ (f w)) w
-
-  cart-ar : {U X V Y W Z : Set}
-    → {α : U → X → Set}
-    → {β : V → Y → Set}
-    → {γ : W → Z → Set}
-    → Hom (!ₒ (W , Z , γ)) (!ₒ (U , X , α))
-    → Hom (!ₒ (W , Z , γ)) (!ₒ (V , Y , β))
-    → Hom (!ₒ (W , Z , γ)) ((!ₒ (U , X , α)) ⊗ₒ (!ₒ (V , Y , β)))
-  cart-ar {U}{X}{V}{Y}{W}{Z}{α}{β}{γ} (f , F , p₁) (g , G , p₂)
-    = (λ w → f w , g w) , cart-ar-crt {α = α}{β} (f , F , p₁) (g , G , p₂) , cart-ar-cond
-      where
-        cart-ar-cond : ∀{u : W} {y : Σ (V → U → 𝕃 X) (λ x → U → V → 𝕃 Y)} →
-          all-pred (γ u) (cart-ar-crt {α = α}{β} (f , F , p₁) (g , G , p₂) y u) →
-          ((λ u₁ f₁ → all-pred (α u₁) (f₁ u₁)) ⊗ᵣ
-          (λ u₁ f₁ → all-pred (β u₁) (f₁ u₁)))
-          (f u , g u) y
-        cart-ar-cond {w}{j₁ , j₂} p
-          rewrite
-            all-pred-append {f = γ w}{F (j₁ (g w)) w}{G (j₂ (f w)) w} ∧-unit ∧-assoc with p
-        ... | (a , b) = p₁ a , p₂ b
-
-  cart-diag₁ : {U X V Y W Z : Set}
-    → {α : U → X → Set}
-    → {β : V → Y → Set}
-    → {γ : W → Z → Set}
-    → {f : Hom (W , Z , γ) (U , X , α)}
-    → {g : Hom (W , Z , γ) (V , Y , β)}
-    → _≡h_ { !ₒ (W , Z , γ)}{ !ₒ (U , X , α)}
-      (!ₐ {W , Z , γ}{U , X , α} f)
-      (comp { !ₒ (W , Z , γ)}
-            {((!ₒ (U , X , α)) ⊗ₒ (!ₒ (V , Y , β)))}
-            { !ₒ (U , X , α)}
-            (cart-ar {α = α}{β}{γ} (!ₐ {W , Z , γ}{U , X , α} f) (!ₐ {W , Z , γ}{V , Y , β} g))
-            π₁)
-  cart-diag₁ {f = f , F , p₁}{g , G , p₂}
-    = refl , ext-set (λ {j} → ext-set (λ {w} → sym (++[] (map F (j (f w))))))
-
-  cart-diag₂ : {U X V Y W Z : Set}
-    → {α : U → X → Set}
-    → {β : V → Y → Set}
-    → {γ : W → Z → Set}
-    → {f : Hom (W , Z , γ) (U , X , α)}
-    → {g : Hom (W , Z , γ) (V , Y , β)}
-    → _≡h_ { !ₒ (W , Z , γ)}{ !ₒ (V , Y , β)}
-      (!ₐ {W , Z , γ}{V , Y , β} g)
-      (comp { !ₒ (W , Z , γ)}
-            {((!ₒ (U , X , α)) ⊗ₒ (!ₒ (V , Y , β)))}
-            { !ₒ (V , Y , β)}
-            (cart-ar {α = α}{β}{γ} (!ₐ {W , Z , γ}{U , X , α} f) (!ₐ {W , Z , γ}{V , Y , β} g))
-            π₂)
-  cart-diag₂ {f = f , F , p₁}{g , G , p₂}
-    = refl , ext-set (λ {j} → ext-set (λ {w} → refl))
--}
+  refl , ext-set (λ {u} → ext-set (λ {l} → aux {l}))
+  where
+    aux : ∀{a : 𝕃 X} → a ++ [] ≡ foldr _++_ [] (map (λ x → x :: []) a)
+    aux {[]} = refl
+    aux {x :: xs} rewrite (++[] xs) | sym (foldr-map {_}{X}{xs}) = refl    
