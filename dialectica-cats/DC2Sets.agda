@@ -245,43 +245,40 @@ uncur : {A B C : Obj}
   → Hom A (B ⊸ₒ C)
   → Hom (A ⊗ₒ B) C
 uncur {U , X , α}{V , Y , β}{W , Z , γ} (f , F , p₁)
-  = h , (H , cond)
-  where
-  h : Σ U (λ x → V) → W
-  h (u , v) with f u
-  ... | i , I = i v
-  H : Σ U (λ x → V) → Z → Σ X (λ x → Y)
-  H (u , v) z with f u
-  ... | i , I = F u (v , z) , I v z
-  cond : {u : Σ U (λ x → V)} {z : Z} → (α ⊗ᵣ β) u (H u z) → γ (h u) z
-  cond {u , v}{z} r with (p₁ {u}{v , z})
+  = let h = λ r → fst (f (fst r)) (snd r)
+        H = λ r z → F (fst r) (snd r , z) , snd (f (fst r)) (snd r) z
+     in h , (H , cond)
+ where
+  cond : {u : Σ U (λ x → V)} {y : Z} →
+      (α ⊗ᵣ β) u (F (fst u) (snd u , y) , snd (f (fst u)) (snd u) y) →
+      γ (fst (f (fst u)) (snd u)) y
+  cond {u , v}{z} (p₂ , p₃) with p₁ {u} {v , z}
   ... | p₄ with f u
-  ... | i , I with r
-  ... | p₂ , p₃ = p₄ p₂ p₃
+  ... | i , I = p₄ p₂ p₃
   
-{-
 cur-uncur-bij₁ : ∀{A B C}{f : Hom (A ⊗ₒ B) C}
   → uncur (cur f) ≡h f
 cur-uncur-bij₁ {U , X , α}{V , Y , β}{W , Z , γ}{f , F , p₁} = ext-set aux₁ , ext-set aux₂
  where
    aux₁ : {a : Σ U (λ x → V)} → f (fst a , snd a) ≡ f a
    aux₁ {u , v} = refl
-   
-   aux₂ : {a : Z} → ((λ v → fst (F a) v) , (λ u → snd (F a) u)) ≡ F a
-   aux₂ {z} with F z
-   ... | j₁ , j₂ = refl
+   aux₂ : {a : Σ U (λ x → V)} → (λ z → fst (F (fst a , snd a) z) , snd (F (fst a , snd a) z)) ≡ F a
+   aux₂ {u , v} = ext-set aux₃
+    where
+      aux₃ : {a : Z} → (fst (F (u , v) a) , snd (F (u , v) a)) ≡ F (u , v) a
+      aux₃ {z} with F (u , v) z
+      ... | x , y = refl
 
 cur-uncur-bij₂ : ∀{A B C}{g : Hom A (B ⊸ₒ C)}
   → cur (uncur g) ≡h g
-cur-uncur-bij₂ {U , X , α}{V , Y , β}{W , Z , γ}{g , G , p₁} = ext-set aux₁ , ext-set aux₂
+cur-uncur-bij₂ {U , X , α}{V , Y , β}{W , Z , γ}{g , G , p₁} = (ext-set aux) , ext-set (ext-set aux')
  where
-   aux₁ : {a : U} → ((λ v → fst (g a) v) , (λ z → snd (g a) z)) ≡ g a
-   aux₁ {u} with g u
-   ... | (j₁ , j₂) = refl
-
-   aux₂ : {a : Σ V (λ x → Z)} → G (fst a , snd a) ≡ G a
-   aux₂ {v , z} = refl
-   
+  aux : {a : U} → ((λ v → fst (g a) v) , (λ v z → snd (g a) v z)) ≡ g a
+  aux {u} with g u
+  ... | i , I = refl
+  aux' : {u : U}{r : Σ V (λ x → Z)} → G u (fst r , snd r) ≡ G u r
+  aux' {u}{v , z} = refl
+{-
 -- The of-course exponential:
 !ₒ-cond : ∀{U X : Set}
   → (U → X → Set)
