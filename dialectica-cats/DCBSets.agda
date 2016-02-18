@@ -1,4 +1,4 @@
-module WPDC2Sets where
+module DCBSets where
 
 open import prelude
 
@@ -117,3 +117,4 @@ _⊗ₐ_ {(U , X , _ , _ , α)}{(V , Y , _ , _ , β)}{(W , Z , _ , _ , γ)}{(S ,
  where
   cond : {u : Σ U (λ x → V)} {y : Y} → (α ⊗ᵣ β) u (n₁ triv , y) → β (snd u) y
   cond {u , v}{y} (p₁ , p₂) = p₂
+
