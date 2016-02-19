@@ -102,50 +102,23 @@ _⊗ₐ_ {(U , X , _ , α , _)}{(V , Y , _ , β , _)}{(W , Z , _ , γ , _)}{(S ,
   p⊗ : {u : Σ U (λ x → V)} {y : Σ Z (λ x → T)} → (α ⊗ᵣ β) u (F⊗ {F = F}{G} u y) → (γ ⊗ᵣ δ) (⟨ f , g ⟩ u) y
   p⊗ {u , v}{z , t} (p₃ , p₄) = p₁  p₃ , p₂ p₄
 
-π₁ : {U X V Y : Set}
-    → {α : U → X → Set}
-    → {β : V → Y → Set}
-    → {m₁ : ⊤ → U}
-    → {n₁ : ⊤ → X}
-    → {m₂ : ⊤ → V}
-    → {n₂ : ⊤ → Y}
-    → {d₁ : ∀(u : U)(x : X) → Dec (α u x)}
-    → {d₂ : ∀(v : V)(y : Y) → Dec (β v y)}
-    → Hom ((U , X , n₁ , α , d₁) ⊗ₒ (V , Y , n₂ , β , d₂)) (U , X , n₁ , α , d₁)
-π₁ {U}{X}{V}{Y}{α}{β}{m₁}{n₁}{m₂}{n₂} = fst , (λ r x → x , n₂ triv) , cond
+π₁ : {A B : Obj} → Hom (A ⊗ₒ B) A
+π₁ {U , X , n₁ , α , d₁}{V , Y , n₂ , β , d₂} = fst , (λ r x → x , n₂ triv) , cond
  where
    cond : {u : Σ U (λ x → V)} {y : X} → (α ⊗ᵣ β) u (y , n₂ triv) → α (fst u) y
    cond {u , v}{x} (p₁ , p₂) = p₁
 
-π₂ : {U X V Y : Set}
-    → {α : U → X → Set}
-    → {β : V → Y → Set}
-    → {m₁ : ⊤ → U}
-    → {n₁ : ⊤ → X}
-    → {m₂ : ⊤ → V}
-    → {n₂ : ⊤ → Y}
-    → {d₁ : ∀(u : U)(x : X) → Dec (α u x)}
-    → {d₂ : ∀(v : V)(y : Y) → Dec (β v y)}    
-    → Hom ((U , X , n₁ , α , d₁) ⊗ₒ (V , Y , n₂ , β , d₂)) (V , Y , n₂ , β , d₂)
-π₂ {U}{X}{V}{Y}{α}{β}{m₁}{n₁}{m₂}{n₂} = snd , (λ r y → n₁ triv , y) , cond
+π₂ : {A B : Obj} → Hom (A ⊗ₒ B) B
+π₂ {U , X , n₁ , α , d₁}{V , Y , n₂ , β , d₂} = snd , (λ r y → n₁ triv , y) , cond
  where
   cond : {u : Σ U (λ x → V)} {y : Y} → (α ⊗ᵣ β) u (n₁ triv , y) → β (snd u) y
   cond {u , v}{y} (p₁ , p₂) = p₂
 
-cart-ar : {U X V Y W Z : Set}
-  → {α : U → X → Set}
-  → {β : V → Y → Set}
-  → {γ : W → Z → Set}
-  → {n₁ : ⊤ → X}
-  → {n₂ : ⊤ → Y}
-  → {n₃ : ⊤ → Z}
-  → {d₁ : ∀(u : U)(x : X) → Dec (α u x)}
-  → {d₂ : ∀(v : V)(y : Y) → Dec (β v y)}
-  → {d₃ : ∀(w : W)(z : Z) → Dec (γ w z)}  
-  → Hom (W , Z , n₃ , γ , d₃) (U , X , n₁ , α , d₁)
-  → Hom (W , Z , n₃ , γ , d₃) (V , Y , n₂ , β , d₂)
-  → Hom (W , Z , n₃ , γ , d₃) ((U , X , n₁ , α , d₁) ⊗ₒ (V , Y , n₂ , β , d₂))
-cart-ar {U}{X}{V}{Y}{W}{Z}{α}{β}{γ}{n₁}{n₂}{n₃}{d₁}{d₂}{d₃} (f , F , p₁) (g , G , p₂) = trans-× f g ,  cart-ar-d , cond
+cart-ar : {A B C : Obj}
+  → (f : Hom C A)
+  → (g : Hom C B)
+  → Hom C (A ⊗ₒ B)
+cart-ar {U , X , x , α , d₁}{V , Y , y , β , d₂}{W , Z , z , γ , d₃} (f , F , p₁) (g , G , p₂) = trans-× f g ,  cart-ar-d , cond
  where
    cart-ar-d : W → Σ X (λ x → Y) → Z
    cart-ar-d w (x , y) with d₂ (g w) y
@@ -157,4 +130,14 @@ cart-ar {U}{X}{V}{Y}{W}{Z}{α}{β}{γ}{n₁}{n₂}{n₃}{d₁}{d₂}{d₃} (f , 
    ... | yes t = p₁ p₃ , t
    ... | no t = ⊥-elim (t (p₂ p₃)) , p₂  p₃
 
+cart-diag₁ : ∀{A B C : Obj}
+  → {f : Hom C A}
+  → {g : Hom C B}
+  → (cart-ar f g) ○ π₁ ≡h f
+cart-diag₁ = {!!}
 
+cart-diag₂ : ∀{A B C : Obj}
+  → {f : Hom C A}
+  → {g : Hom C B}
+  → (cart-ar f g) ○ π₂ ≡h g
+cart-diag₂ = {!!}
