@@ -114,30 +114,42 @@ _⊗ₐ_ {(U , X , _ , α , _)}{(V , Y , _ , β , _)}{(W , Z , _ , γ , _)}{(S ,
   cond : {u : Σ U (λ x → V)} {y : Y} → (α ⊗ᵣ β) u (n₁ triv , y) → β (snd u) y
   cond {u , v}{y} (p₁ , p₂) = p₂
 
+cart-ar-d : {X Y W Z V : Set}{β : V → Y → Set}{F  : W → X → Z}{G  : W → Y → Z}{g  : W → V}{d₂ : (v' : V) (y' : Y) → Dec (β v' y')} → W → Σ X (λ x → Y) → Z
+cart-ar-d {β = β}{F}{G}{g}{d₂} w (x , y) with d₂ (g w) y
+... | yes t = F w x
+... | no t = G w y
+
 cart-ar : {A B C : Obj}
   → (f : Hom C A)
   → (g : Hom C B)
   → Hom C (A ⊗ₒ B)
-cart-ar {U , X , x , α , d₁}{V , Y , y , β , d₂}{W , Z , z , γ , d₃} (f , F , p₁) (g , G , p₂) = trans-× f g ,  cart-ar-d , cond
+cart-ar {U , X , x , α , d₁}{V , Y , y , β , d₂}{W , Z , z , γ , d₃} (f , F , p₁) (g , G , p₂) = trans-× f g ,  cart-ar-d {X}{Y}{W}{Z}{V}{β}{F}{G}{g}{d₂} , cond
  where
-   cart-ar-d : W → Σ X (λ x → Y) → Z
-   cart-ar-d w (x , y) with d₂ (g w) y
-   ... | yes t = F w x
-   ... | no t = G w y
-
-   cond : {u : W} {y : Σ X (λ x → Y)} → γ u (cart-ar-d u y) → (α ⊗ᵣ β) (f u , g u) y
+   cond : {u : W} {y : Σ X (λ x → Y)} → γ u (cart-ar-d {X}{Y}{W}{Z}{V}{β}{F}{G}{g}{d₂} u y) → (α ⊗ᵣ β) (f u , g u) y
    cond {w}{x , y} p₃ with d₂ (g w) y
    ... | yes t = p₁ p₃ , t
-   ... | no t = ⊥-elim (t (p₂ p₃)) , p₂  p₃
+   ... | no t = ⊥-elim (t (p₂ p₃)) , p₂ p₃
 
-cart-diag₁ : ∀{A B C : Obj}
-  → {f : Hom C A}
-  → {g : Hom C B}
-  → (cart-ar f g) ○ π₁ ≡h f
-cart-diag₁ = {!!}
+-- Cannot prove the following:
+-- 
+-- cart-diag₁ : ∀{A B C : Obj}
+--   → {f : Hom C A}
+--   → {g : Hom C B}
+--   → (cart-ar f g) ○ π₁ ≡h f
+-- cart-diag₁ {U , X , x , α , d₁}{V , Y , y , β , d₂}{W , Z , z , γ , d₃}{f , F , p₁}{g , G , p₂} = ext-set refl , {!!}
+--  where
+--    aux : (λ u z₁ → cart-ar-d {X} {Y} {W} {Z} {V} {β} {F} {G} {g} {d₂} u (z₁ , y triv)) ≡ F
+--    aux = ext-set (λ {w} → ext-set (λ {x₁} → {!!}))
+--     where
+--      aux' : ∀{w x₁} → cart-ar-d {X} {Y} {W} {Z} {V} {β} {F} {G} {g} {d₂} w (x₁ , y triv) ≡ F w x₁
+--      aux' {w}{x₁} with d₂ (g w) (y triv)
+--      ... | yes t = refl
+--      ... | no t with d₃ w (G w (y triv))
+--      ... | yes t' = ⊥-elim (t (p₂ t'))
+--      ... | no t' = {!!}
 
-cart-diag₂ : ∀{A B C : Obj}
-  → {f : Hom C A}
-  → {g : Hom C B}
-  → (cart-ar f g) ○ π₂ ≡h g
-cart-diag₂ = {!!}
+-- cart-diag₂ : ∀{A B C : Obj}
+--   → {f : Hom C A}
+--   → {g : Hom C B}
+--   → (cart-ar f g) ○ π₂ ≡h g
+-- cart-diag₂ = {!!}

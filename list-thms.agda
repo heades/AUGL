@@ -41,8 +41,6 @@ foldr-append : ∀{ℓ₁ ℓ₂}{A : Set ℓ₁}{B : Set ℓ₂}{l₁ l₂ : �
 foldr-append {l₁ = []}{l₂} = refl
 foldr-append {_}{_}{A}{B}{l₁ = x :: xs}{l₂} rewrite sym (foldr-append {A = A}{B} {l₁ = xs}{l₂}) = ++-assoc x (foldr _++_ [] xs) (foldr _++_ [] l₂)
 
--- foldr-append = {!!}
-
 foldr-append-fun : ∀{ℓ₁ ℓ₂}{A : Set ℓ₁}{B : Set ℓ₂}{l₁ l₂ : 𝕃 (A → 𝕃 B)}{a : A}
   → (foldr (λ f → _++_ (f a)) [] l₁) ++ (foldr (λ f → _++_ (f a)) [] l₂) ≡ foldr (λ f → _++_ (f a)) [] (l₁ ++ l₂)
 foldr-append-fun {l₁ = []}{_}{a} = refl
@@ -51,7 +49,11 @@ foldr-append-fun {l₁ = x :: l₁}{l₂}{a}
     ++-assoc (x a) (foldr (λ f → _++_ (f a)) [] l₁) (foldr (λ f → _++_ (f a)) [] l₂)
   | foldr-append-fun {l₁ = l₁}{l₂}{a}
  = refl
- 
+
+foldr-map : ∀{ℓ}{A : Set ℓ}{l : 𝕃 A} → l ≡ foldr _++_ [] (map (λ x₁ → x₁ :: []) l)
+foldr-map {_}{_}{[]} = refl
+foldr-map {ℓ}{A}{x :: xs} rewrite sym (foldr-map {ℓ}{A}{xs}) = refl
+
 invert𝕃 : ∀{ℓ}{A : Set ℓ}{t : A}{ts : 𝕃 A} → t :: ts ≢ []
 invert𝕃 ()
 

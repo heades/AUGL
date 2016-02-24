@@ -22,3 +22,13 @@ postulate ∧-assoc : ∀{ℓ}{A B C : Set ℓ} →  (A ∧ (B ∧ C)) ≡ ((A �
 -- The following defines a commutative monoid as lists:
 _* = 𝕃
 postulate *-comm : ∀{A : Set}{l₁ l₂ : A *} → l₁ ++ l₂ ≡ l₂ ++ l₁
+
+×-⊥₁ : (⊥ × ⊥) → ⊥
+×-⊥₁ (x , y) = x
+
+tar⊥-× : {A B : Set}
+  → (f : A -> ⊥)
+  → (g : B → ⊥)
+  → (A × B) → ⊥
+tar⊥-× f g (a , b) = ×-⊥₁ ((f a , g b))       
+

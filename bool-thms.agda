@@ -3,6 +3,7 @@ module bool-thms where
 open import bool
 open import eq
 open import sum
+open import empty
 
 ~~-elim : ∀ (b : 𝔹) → ~ ~ b ≡ b
 ~~-elim tt = refl
@@ -73,3 +74,6 @@ ite-arg f ff x y = refl
 &&-ff : ∀(b : 𝔹) → b && ff ≡ ff
 &&-ff tt = refl
 &&-ff ff = refl
+
+ff≡tt : ff ≡ tt → ⊥
+ff≡tt ()
