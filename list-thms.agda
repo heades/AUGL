@@ -37,6 +37,17 @@ map-compose : ∀ {ℓ ℓ' ℓ''} {A : Set ℓ} {B : Set ℓ'}{C : Set ℓ''} �
 map-compose f g [] = refl
 map-compose f g (x :: xs) rewrite map-compose f g xs = refl
 
+foldr-monoid : ∀{ℓ}{A B : Set ℓ}{l₁ l₂ : 𝕃 A}{_⊗_ : B → B → B}{f : A → B}{b : B}
+  {p-sym : ∀{a} → b ⊗ a ≡ a}
+  {p-assoc : ∀{a b c} → a ⊗ (b ⊗ c) ≡ (a ⊗ b) ⊗ c}
+  → (foldr (λ x r → (f x) ⊗ r) b l₁) ⊗ (foldr (λ x r → (f x) ⊗ r) b l₂) ≡ foldr (λ x r → (f x) ⊗ r) b (l₁ ++ l₂)
+foldr-monoid {ℓ}{A}{B}{[]}{l₂}{_⊗_}{f}{b}{p-sym} rewrite p-sym {foldr (λ x → _⊗_ (f x)) b l₂} = refl
+foldr-monoid {ℓ}{A}{B}{y :: ys}{l₂}{_⊗_}{f}{b}{p-sym}{p-assoc}
+ rewrite
+   sym (p-assoc {f y}{foldr (λ x → _⊗_ (f x)) b ys}{foldr (λ x → _⊗_ (f x)) b l₂})
+ | foldr-monoid {l₁ = ys}{l₂}{_⊗_}{f}{b}{p-sym}{p-assoc}
+ = refl
+
 foldr-append : ∀{ℓ₁ ℓ₂}{A : Set ℓ₁}{B : Set ℓ₂}{l₁ l₂ : 𝕃 (𝕃 B)} → (foldr _++_ [] l₁) ++ (foldr _++_ [] l₂) ≡ foldr _++_ [] (l₁ ++ l₂)
 foldr-append {l₁ = []}{l₂} = refl
 foldr-append {_}{_}{A}{B}{l₁ = x :: xs}{l₂} rewrite sym (foldr-append {A = A}{B} {l₁ = xs}{l₂}) = ++-assoc x (foldr _++_ [] xs) (foldr _++_ [] l₂)

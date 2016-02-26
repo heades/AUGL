@@ -18,6 +18,9 @@ postulate ext-set : ∀{l1 l2 : level} → extensionality {l1} {l2}
 -- univalence:
 postulate ∧-unit : ∀{ℓ}{A : Set ℓ} → A ≡ (⊤ ∧ A)
 postulate ∧-assoc : ∀{ℓ}{A B C : Set ℓ} →  (A ∧ (B ∧ C)) ≡ ((A ∧ B) ∧ C)
+postulate ∧-twist : ∀{ℓ}{A B : Set ℓ} →  (A ∧ B) ≡ (B ∧ A)
+-- Provable from the above axioms:
+postulate assoc-twist₁ : {A B C D : Set} → ((A × C) × (B × D)) ≡ ((A × B) × (C × D))
 
 -- The following defines a commutative monoid as lists:
 _* = 𝕃
