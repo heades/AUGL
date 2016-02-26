@@ -5,7 +5,10 @@ open import relations
 
 -- The objects:
 Obj : Set₁
-Obj = Σ[ U ∈ Set ] (Σ[ X ∈ Set ] (Σ[ x ∈ (⊤ → X) ] (Σ[ d ∈ (X × X → X) ](Σ[ α ∈ (U → X → Set) ]( (∀{u : U}{x₁ x₂ : X} → α u (d (x₁ , x₂)) → ((α u x₁) × (α u x₂))) × ( ∀{Y : Set}{x' : X}{F : Y → X}{y : ⊤ → Y} → d (x' , F (y triv)) ≡ x' ) × ( ∀{Y : Set}{x' : X}{F : Y → X}{y : ⊤ → Y} → d (F (y triv) , x') ≡ x'  ))))))
+Obj = Σ[ U ∈ Set ] (Σ[ X ∈ Set ] (Σ[ x ∈ (⊤ → X) ] (Σ[ d ∈ (X × X → X) ](Σ[ α ∈ (U → X → Set) ](
+  (∀{u : U}{x₁ x₂ : X} → α u (d (x₁ , x₂)) → ((α u x₁) × (α u x₂))) ×
+  ( ∀{Y : Set}{x' : X}{F : Y → X}{y : ⊤ → Y} → d (x' , F (y triv)) ≡ x' ) ×
+  ( ∀{Y : Set}{x' : X}{F : Y → X}{y : ⊤ → Y} → d (F (y triv) , x') ≡ x'  ))))))
 
 -- The morphisms:
 Hom : Obj → Obj → Set
