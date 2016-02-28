@@ -24,6 +24,7 @@ postulate assoc-twist₁ : {A B C D : Set} → ((A × C) × (B × D)) ≡ ((A ×
 
 -- The following defines a commutative monoid as lists:
 _* = 𝕃
+
 postulate *-comm : ∀{A : Set}{l₁ l₂ : A *} → l₁ ++ l₂ ≡ l₂ ++ l₁
 
 ×-⊥₁ : (⊥ × ⊥) → ⊥

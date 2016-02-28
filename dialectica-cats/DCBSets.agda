@@ -160,3 +160,86 @@ cart-diag₂ : ∀{A B C : Obj}
   → (cart-ar f g) ○ π₂ ≡h g
 cart-diag₂ {U , X , x , d₁ , α , pr₁ , q₁ , q₂}{V , Y , y , d₂ , β , q₃ , q₄ , q₅}{W , Z , z , d₃ , γ , q₆ , q₇ , q₈}{f , F , p₁}{g , G , p₂} = refl , ext-set (λ {w} → ext-set (λ {y₁} → q₈ {x' = G w y₁}{F w}{x}))
 
+-- The □-comonad:
+
+□ₒ-cond : ∀{U X : Set} → (α : U → X → Set) → U → 𝕃 X → Set  
+□ₒ-cond {U}{X} α u [] = ⊤
+□ₒ-cond {U}{X} α u (x :: xs) = (α u x) × (□ₒ-cond α u xs)
+
+□ₒ-cond-++ : ∀{U X : Set}{α : U → X → Set}{u : U}{l₁ l₂ : 𝕃 X}
+  → □ₒ-cond α u (l₁ ++ l₂) ≡ ((□ₒ-cond α u l₁) × (□ₒ-cond α u l₂))
+□ₒ-cond-++ {U}{X}{α}{u}{[]}{l₂} = ∧-unit
+□ₒ-cond-++ {U}{X}{α}{u}{x :: xs}{l₂} rewrite □ₒ-cond-++ {U}{X}{α}{u}{xs}{l₂} = ∧-assoc
+
+□ₒ : Obj → Obj
+□ₒ (U , X , x , d , α , pr , q₁ , q₂) = U ,  X * , (λ t → [ x t ]) , □d , □ₒ-cond {U}{X} α , {!!} , {!!} , {!!}
+ where
+
+  □d : (X *) × (X *) → X *   
+  □d (l₁ , l₂) = l₁ ++ l₂
+
+  -- □pr : {u : U} {x₁ x₂ : 𝕃 X}
+  --       → □ₒ-cond α u (□d (x₁ , x₂))
+  --       → Σ (□ₒ-cond α u x₁) (λ x₃ → □ₒ-cond α u x₂)
+  -- □pr {_}{[]} {[]} x₁ = triv , triv
+  -- □pr {u}{x₁ = []} {x₁ :: x₂} (a , b) = triv , snd (pr a) , snd (□pr {u}{[]}{x₂} b)
+  -- □pr {u}{x₁ = x₁ :: x₂} {[]} (a , b) = (fst (pr a) , fst (□pr {u}{x₂}{[]} b)) , triv
+  -- □pr {_}{x₁ :: x₂} {x₃ :: x₄} (a , b) with pr a
+  -- ... | c , e with □pr {x₁ = x₂} b
+  -- ... | f , g = (c , f) , (e , g)
+
+  □q₁ : {Y : Set} {x' : 𝕃 X} {F : Y → 𝕃 X} {y : ⊤ → Y} → □d (x' , F (y triv)) ≡ x'
+  □q₁ {x' = []}{F}{y} = {!!}
+  □q₁ {x' = x₁ :: x'}{F}{y} with F (y triv)
+  ... | [] = {!!}
+  ... | a :: as = {!!}
+
+{-
+□ₐ-s : ∀{U Y X : Set}
+  → (U → Y → X)
+  → (U → Y * → X *)
+□ₐ-s f u l = map (f u) l
+
+□ₐ : {A B : Obj} → Hom A B → Hom (□ₒ A) (□ₒ B)
+□ₐ {U , X , α}{V , Y , β} (f , F , p) = f , (□ₐ-s F , aux)
+ where
+   aux : {u : U} {y : 𝕃 Y} → □ₒ-cond α u (□ₐ-s F u y) → □ₒ-cond β (f u) y
+   aux {u}{[]} p₁ = triv
+   aux {u}{y :: ys} (p₁ , p₂) = p p₁ , aux p₂
+
+-- Of-course is a comonad:
+ε : ∀{A} → Hom (□ₒ A) A
+ε {U , X , α} = id-set , (λ u x → [ x ]) , fst
+
+δ-s : {U X : Set} → U → 𝕃 (𝕃 X) → 𝕃 X
+δ-s u xs = foldr _++_ [] xs
+  
+δ : ∀{A} → Hom (□ₒ A) (□ₒ (□ₒ A))
+δ {U , X , α} = id-set , δ-s , cond
+ where
+   cond : {u : U} {y : 𝕃 (𝕃 X)} → □ₒ-cond α u (foldr _++_ [] y) → □ₒ-cond (□ₒ-cond α) u y
+   cond {u}{[]} p = triv
+   cond {u}{l :: ls} p with □ₒ-cond-++ {U}{X}{α}{u}{l}{foldr _++_ [] ls}
+   ... | p' rewrite p' with p
+   ... | p₂ , p₃ = p₂ , cond {u}{ls} p₃    
+
+comonand-diag₁ : ∀{A}
+  → (δ {A}) ○ (□ₐ (δ {A})) ≡h (δ {A}) ○ (δ { □ₒ A})
+comonand-diag₁ {U , X , α} = refl , ext-set (λ {x} → ext-set (λ {l} → aux {x} {l}))
+ where
+  aux : ∀{x : U}{l : 𝕃 (𝕃 (𝕃 X))}
+    → foldr _++_ [] (□ₐ-s (λ u xs
+    → foldr _++_ [] xs) x l) ≡ foldr _++_ [] (foldr _++_ [] l)
+  aux {u}{[]} = refl
+  aux {u}{x :: xs} rewrite aux {u}{xs} = foldr-append {_}{_}{X}{X}{x}{foldr _++_ [] xs}
+
+comonand-diag₂ : ∀{A}
+  → (δ {A}) ○ (ε { □ₒ A}) ≡h (δ {A}) ○ (□ₐ (ε {A}))
+comonand-diag₂ {U , X , α} =
+  refl , ext-set (λ {u} → ext-set (λ {l} → aux {l}))
+  where
+    aux : ∀{a : 𝕃 X} → a ++ [] ≡ foldr _++_ [] (map (λ x → x :: []) a)
+    aux {[]} = refl
+    aux {x :: xs} rewrite (++[] xs) | sym (foldr-map {_}{X}{xs}) = refl    
+
+-}

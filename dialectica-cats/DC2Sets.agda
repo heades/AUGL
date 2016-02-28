@@ -331,11 +331,6 @@ comonand-diag₁ {U , X , α} = refl , ext-set (λ {x} → ext-set (λ {l} → a
   aux {u}{[]} = refl
   aux {u}{x :: xs} rewrite aux {u}{xs} = foldr-append {_}{_}{X}{X}{x}{foldr _++_ [] xs}
 
-
-foldr-map : ∀{ℓ}{A : Set ℓ}{l : 𝕃 A} → l ≡ foldr _++_ [] (map (λ x₁ → x₁ :: []) l)
-foldr-map {_}{_}{[]} = refl
-foldr-map {ℓ}{A}{x :: xs} rewrite sym (foldr-map {ℓ}{A}{xs}) = refl
-
 comonand-diag₂ : ∀{A}
   → (δ {A}) ○ (ε { !ₒ A}) ≡h (δ {A}) ○ (!ₐ (ε {A}))
 comonand-diag₂ {U , X , α} =
