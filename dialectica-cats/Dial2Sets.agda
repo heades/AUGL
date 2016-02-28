@@ -331,6 +331,7 @@ cur-uncur-bij₂ {U , X , α}{V , Y , β}{W , Z , γ}{g , G , p₁} = ext-set au
    ... | p' rewrite p' = fst p , δ-cond {u} {l'} (snd p)
 
 -- These diagrams can be found on page 22 of the report.
+{-
 comonand-diag₁ : ∀{A}
   → (δ {A}) ○ (!ₐ (δ {A})) ≡h (δ {A}) ○ (δ { !ₒ A})
 comonand-diag₁ {U , X , α} =
@@ -362,7 +363,7 @@ comonand-diag₂ {U , X , α} =
     cong2 {a = x} {x} {l}
           {foldr (λ f₁ → _++_ (f₁ a)) [] (map (λ x₁ y → x₁ :: []) l)} _::_ refl
           IH
-          
+-}          
 module Cartesian where
   π₁ : {U X V Y : Set}
     → {α : U → X → Set}
