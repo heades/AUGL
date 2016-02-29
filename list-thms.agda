@@ -48,9 +48,9 @@ foldr-monoid {ℓ}{A}{B}{y :: ys}{l₂}{_⊗_}{f}{b}{p-sym}{p-assoc}
  | foldr-monoid {l₁ = ys}{l₂}{_⊗_}{f}{b}{p-sym}{p-assoc}
  = refl
 
-foldr-append : ∀{ℓ₁ ℓ₂}{A : Set ℓ₁}{B : Set ℓ₂}{l₁ l₂ : 𝕃 (𝕃 B)} → (foldr _++_ [] l₁) ++ (foldr _++_ [] l₂) ≡ foldr _++_ [] (l₁ ++ l₂)
+foldr-append : ∀{ℓ₂}{B : Set ℓ₂}{l₁ l₂ : 𝕃 (𝕃 B)} → (foldr _++_ [] l₁) ++ (foldr _++_ [] l₂) ≡ foldr _++_ [] (l₁ ++ l₂)
 foldr-append {l₁ = []}{l₂} = refl
-foldr-append {_}{_}{A}{B}{l₁ = x :: xs}{l₂} rewrite sym (foldr-append {A = A}{B} {l₁ = xs}{l₂}) = ++-assoc x (foldr _++_ [] xs) (foldr _++_ [] l₂)
+foldr-append {_}{B}{l₁ = x :: xs}{l₂} rewrite sym (foldr-append {l₁ = xs}{l₂}) = ++-assoc x (foldr _++_ [] xs) (foldr _++_ [] l₂)
 
 foldr-append-fun : ∀{ℓ₁ ℓ₂}{A : Set ℓ₁}{B : Set ℓ₂}{l₁ l₂ : 𝕃 (A → 𝕃 B)}{a : A}
   → (foldr (λ f → _++_ (f a)) [] l₁) ++ (foldr (λ f → _++_ (f a)) [] l₂) ≡ foldr (λ f → _++_ (f a)) [] (l₁ ++ l₂)
