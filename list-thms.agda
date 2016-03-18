@@ -94,7 +94,22 @@ reverse-++h l1 (x :: xs) rewrite reverse-++h (x :: l1) xs | reverse-++h (x :: []
 
 reverse-++ : ∀{ℓ}{A : Set ℓ}(l1 l2 : 𝕃 A) → reverse(l1 ++ l2) ≡ reverse(l2) ++ reverse(l1)
 reverse-++ [] l2 rewrite ++[] (reverse l2) = refl
-reverse-++ (x :: xs) l2 rewrite reverse-++h (x :: []) (xs ++ l2) | reverse-++ xs l2 | ++-assoc (reverse l2) (reverse xs) (x :: []) | sym (reverse-++h (x :: []) xs) = refl 
+reverse-++ (x :: xs) l2 rewrite reverse-++h (x :: []) (xs ++ l2) | reverse-++ xs l2 | ++-assoc (reverse l2) (reverse xs) (x :: []) | sym (reverse-++h (x :: []) xs) = refl
+
+reverse-involution-aux : ∀{ℓ}{A : Set ℓ}(h h' l : 𝕃 A) → reverse-helper h (reverse-helper h' l) ≡ (reverse-helper [] h') ++ l ++ h
+reverse-involution-aux h h' [] = reverse-++h h h'
+reverse-involution-aux h h' (x₁ :: l) rewrite reverse-involution-aux h (x₁ :: h') l | reverse-++h (x₁ :: []) h' | ++-assoc (reverse-helper [] h') (x₁ :: []) (l ++ h) = refl
+
+reverse-involution : ∀{ℓ}{A : Set ℓ}(l : 𝕃 A) → reverse (reverse l) ≡ l
+reverse-involution l rewrite reverse-involution-aux [] [] l = ++[] l
+
+reverse-++-bad : ∀{ℓ}{A : Set ℓ}(l1 l2 : 𝕃 A) → reverse-bad (l1 ++ l2) ≡ reverse-bad l2 ++ reverse-bad l1
+reverse-++-bad [] l2 = sym (++[] (reverse-bad l2))
+reverse-++-bad (x :: l1) l2 rewrite reverse-++-bad l1 l2 = ++-assoc (reverse-bad l2) (reverse-bad l1) (x :: [])
+
+reverse-involution-bad : ∀{ℓ}{A : Set ℓ}(l : 𝕃 A) → reverse-bad (reverse-bad l) ≡ l
+reverse-involution-bad [] = refl
+reverse-involution-bad (x :: xs) rewrite reverse-++-bad (reverse-bad xs) (x :: []) | reverse-involution-bad xs = refl
 
 =𝕃-refl : ∀{ℓ}{A : Set ℓ}{l1 : 𝕃 A} → (eq : A → A → 𝔹) → ((x y : A) → x ≡ y → eq x y ≡ tt) → =𝕃 eq l1 l1 ≡ tt
 =𝕃-refl{l1 = []} eq rise = refl
@@ -167,11 +182,15 @@ concat-++ (l :: ls) ls2 rewrite concat-++ ls ls2 = sym (++-assoc l (concat ls) (
 -- consistent as equations.  The respective isomorphisms can be found
 -- in products-thms.agda.
 all-pred-append : ∀{X : Set}{f : X → Set}{l₁ l₂}
-  → (p₁ : ∀{ℓ}{A : Set ℓ} → A ≡ (⊤ ∧ A))
+  → (p₁ : ∀{ℓ}{A : Set ℓ} → A ≡ ((⊤ {ℓ}) ∧ A))
   → (p₂ : ∀{ℓ}{A B C : Set ℓ} →  (A ∧ (B ∧ C)) ≡ ((A ∧ B) ∧ C))
   → all-pred f (l₁ ++ l₂) ≡ ((all-pred f l₁) ∧ (all-pred f l₂))
 all-pred-append {l₁ = []} {l₂} p₁ p₂ = p₁
-all-pred-append {X}{f}{x :: l₁} {l₂} p₁ p₂ rewrite all-pred-append {X}{f}{l₁ = l₁} {l₂} p₁ p₂ = p₂ 
+all-pred-append {X}{f}{x :: l₁} {l₂} p₁ p₂ rewrite all-pred-append {X}{f}{l₁ = l₁} {l₂} p₁ p₂ = p₂
+
+all-pred-triv : {ℓ : Level}{l : 𝕃 (⊤ {ℓ})}(γ : ⊤ {ℓ} → Set ℓ)(p : γ triv) → all-pred γ l
+all-pred-triv {_}{[]} γ p = triv
+all-pred-triv {_}{triv :: l} γ p = p , all-pred-triv γ p
 
 map-proj-⊎₁ : ∀{ℓ ℓ'}{A : Set ℓ}{B : Set ℓ'} → (l : 𝕃 A) → 
                 proj-⊎₁ {A = A}{B} (map inj₁ l) ≡ l

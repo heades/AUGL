@@ -76,7 +76,7 @@ map f []        = []
 map f (x :: xs) = f x :: map f xs
 
 -- The hom part of the list functor.
-list-funct : {A B : Set} → (A → B) → (𝕃 A → 𝕃 B)
+list-funct : {ℓ : Level}{A B : Set ℓ} → (A → B) → (𝕃 A → 𝕃 B)
 list-funct f l = map f l
 
 {- (maybe-map f xs) returns (just ys) if f returns (just y_i) for each
@@ -104,6 +104,10 @@ reverse-helper h (x :: xs) = reverse-helper (x :: h) xs
 reverse : ∀ {ℓ}{A : Set ℓ} → 𝕃 A → 𝕃 A
 reverse l = reverse-helper [] l
 
+reverse-bad : ∀ {ℓ}{A : Set ℓ} → 𝕃 A → 𝕃 A
+reverse-bad [] = []
+reverse-bad (x :: l) = reverse-bad l ++ [ x ]
+
 list-member : ∀{ℓ}{A : Set ℓ}(eq : A → A → 𝔹)(a : A)(l : 𝕃 A) → 𝔹
 list-member eq a [] = ff
 list-member eq a (x :: xs) with eq a x
@@ -129,7 +133,7 @@ list-all : ∀{ℓ}{A : Set ℓ}(pred : A → 𝔹)(l : 𝕃 A) → 𝔹
 list-all pred [] = tt
 list-all pred (x :: xs) = pred x && list-all pred xs
 
-all-pred : {X : Set} → (X → Set) → 𝕃 X → Set
+all-pred : {ℓ : Level}{X : Set ℓ} → (X → Set ℓ) → 𝕃 X → Set ℓ
 all-pred f [] = ⊤
 all-pred f (x₁ :: xs) = (f x₁) ∧ (all-pred f xs) 
 

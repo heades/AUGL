@@ -32,7 +32,7 @@ eq-× refl refl = refl
 module ∧-Isos where
   postulate ext-set : ∀{l1 l2 : level} → extensionality {l1} {l2}
   
-  ∧-unit-l : ∀{ℓ}{A : Set ℓ} → A → A ∧ ⊤
+  ∧-unit-l : ∀{ℓ}{A : Set ℓ} → A → A ∧ (⊤ {ℓ})
   ∧-unit-l x = x , triv
 
   ∧-unit-r : ∀{ℓ}{A : Set ℓ} → A → ⊤ ∧ A

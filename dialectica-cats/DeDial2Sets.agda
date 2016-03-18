@@ -7,15 +7,114 @@ module DeDial2Sets where
 open import prelude
 open import Dial2Sets
 
-Obj⊤ : Set₁
-Obj⊤ = Σ[ U ∈ Set ] (U → ⊤ → Set)
+C : ℕ → Set
+C 0 = ⊤
+C (suc n) = (C n) *
 
+Obj⊤ : Set₁
+Obj⊤ = Σ[ U ∈ Set ] (Σ[ n ∈ ℕ ](U → C n → Set))
+
+-- Interpretation of our objects into objects of DC:
 toObj : Obj⊤ → Obj
-toObj (U , α) = U , ⊤ , α
+toObj (U , n , α) = U , C n , α
+
+Hom⊤ : Obj⊤ → Obj⊤ → Set
+Hom⊤ (U , n₁ , α) (V , n₂ , β) =
+  Σ[ f ∈ (U → V) ]
+    (Σ[ F ∈ ((C n₂) → (C n₁)) ] (∀{u : U}{y : C n₂} → α u (F y) → β (f u) y))
+
+comp⊤ : {A B C : Obj⊤} → Hom⊤ A B → Hom⊤ B C → Hom⊤ A C
+comp⊤ {(U , X , α)} {(V , Y , β)} {(W , Z , γ)} (f , F , p₁) (g , G , p₂) =
+  (g ∘ f , F ∘ G , (λ {u z} p-α → p₂ (p₁ p-α)))
+
+infixl 5 _○⊤_
+
+_○⊤_ = comp⊤
+
+-- The contravariant hom-functor:
+Hom⊤ₐ :  {A' A B B' : Obj⊤} → Hom⊤ A' A → Hom⊤ B B' → Hom⊤ A B → Hom⊤ A' B'
+Hom⊤ₐ f h g = comp⊤ f (comp⊤ g h)
+
+-- The identity function:
+id⊤ : {A : Obj⊤} → Hom⊤ A A 
+id⊤ {(U , n , α)} = (id-set , id-set , id-set)
+
+
+-- In this formalization we will only worry about proving that the
+-- data of morphisms are equivalent, and not worry about the morphism
+-- conditions.  This will make proofs shorter and faster.
+--
+-- If we have parallel morphisms (f,F) and (g,G) in which we know that
+-- f = g and F = G, then the condition for (f,F) will imply the
+-- condition of (g,G) and vice versa.  Thus, we can safly ignore it.
+infix 4 _≡h⊤_
+
+_≡h⊤_ : {A B : Obj⊤} → (f g : Hom⊤ A B) → Set
+_≡h⊤_ {(U , X , α)}{(V , Y , β)} (f , F , p₁) (g , G , p₂) = f ≡ g × F ≡ G
+
+≡h⊤-refl : {A B : Obj⊤}{f : Hom⊤ A B} → f ≡h⊤ f
+≡h⊤-refl {U , X , α}{V , Y , β}{f , F , _} = refl , refl
+
+≡h⊤-trans : ∀{A B}{f g h : Hom⊤ A B} → f ≡h⊤ g → g ≡h⊤ h → f ≡h⊤ h
+≡h⊤-trans {U , X , α}{V , Y , β}{f , F , _}{g , G , _}{h , H , _} (p₁ , p₂) (p₃ , p₄) rewrite p₁ | p₂ | p₃ | p₄ = refl , refl
+
+≡h⊤-sym : ∀{A B}{f g : Hom⊤ A B} → f ≡h⊤ g → g ≡h⊤ f
+≡h⊤-sym {U , X , α}{V , Y , β}{f , F , _}{g , G , _} (p₁ , p₂) rewrite p₁ | p₂ = refl , refl
+
+
+≡h⊤-subst-○ : ∀{A B C : Obj⊤}{f₁ f₂ : Hom⊤ A B}{g₁ g₂ : Hom⊤ B C}{j : Hom⊤ A C}
+  → f₁ ≡h⊤ f₂
+  → g₁ ≡h⊤ g₂
+  → f₂ ○⊤ g₂ ≡h⊤ j
+  → f₁ ○⊤ g₁ ≡h⊤ j
+≡h⊤-subst-○ {U , X , α}
+         {V , Y , β}
+         {W , Z , γ}
+         {f₁ , F₁ , _}
+         {f₂ , F₂ , _}
+         {g₁ , G₁ , _}
+         {g₂ , G₂ , _}
+         {j , J , _}
+         (p₅ , p₆) (p₇ , p₈) (p₉ , p₁₀) rewrite p₅ | p₆ | p₇ | p₈ | p₉ | p₁₀ = refl , refl
+
+○⊤-assoc : ∀{A B C D}{f : Hom⊤ A B}{g : Hom⊤ B C}{h : Hom⊤ C D}
+  → f ○⊤ (g ○⊤ h) ≡h⊤ (f ○⊤ g) ○⊤ h
+○⊤-assoc {U , X , α}{V , Y , β}{W , Z , γ}{S , T , ι}
+        {f , F , _}{g , G , _}{h , H , _} = refl , refl
+
+
+○⊤-idl : ∀{A B}{f : Hom⊤ A B} → id⊤ ○⊤ f ≡h⊤ f
+○⊤-idl {U , X , _}{V , Y , _}{f , F , _} = refl , refl
+
+
+○⊤-idr : ∀{A B}{f : Hom⊤ A B} → f ○⊤ id⊤ ≡h⊤ f
+○⊤-idr {U , X , _}{V , Y , _}{f , F , _} = refl , refl
+
+□ₒ : Obj⊤ → Obj⊤
+□ₒ (U , n , α) = U , (suc n) , (λ u l → all-pred {C n} (α u) l)
+
+□ₐ : {A B : Obj⊤} → Hom⊤ A B → Hom⊤ (□ₒ A) (□ₒ B)
+□ₐ {U , n₁ , α}{V , n₂ , β} (f , F , p) = f , map F , cond
+ where
+  cond : {u : U} {y : 𝕃 (C n₂)} → all-pred (α u) (map F y) → all-pred (β (f u)) y
+  cond {y = []} x = triv
+  cond {y = x :: y} (a , b) = p a , cond b
 
 π-ctr : {U V : Set} → ⊤ → Σ (V → ⊤) (λ x → U → ⊤)
 π-ctr triv = (λ _ → triv) , (λ _ → triv)
 
+a : ∀{X Y} → C ((suc X) + (suc Y)) → (C X) × (C Y)
+a {zero}{Y} l = {!!} , {!!}
+a {suc X} {Y} l = {!fst (a {X}{Y} (foldr _++_ [] l))!} , {!!}
+
+_×ₒ_ : (A B : Obj⊤) → Obj⊤
+(U , X , α) ×ₒ (V , Y , β) = (U × V) , X + Y , {!!}
+-- (U , zero , α) ×ₒ (V , zero , β) = (U × V) , 0 , {!!}
+-- (U , zero , α) ×ₒ (V , suc Y , β) = (U × V) , suc Y , {!!}
+-- (U , suc X , α) ×ₒ (V , zero , β) = (U × V) , (suc X) , {!!}
+-- (U , suc X , α) ×ₒ (V , suc Y , β) = (U × V) , ((suc X) + (suc Y)) , {!!}
+
+{-
 π₁ : {A B : Obj⊤} → Hom ((toObj A) ⊗ₒ (toObj B)) (toObj A)
 π₁ {U , α}{V , β} = fst , π-ctr , cond
  where 
@@ -212,3 +311,11 @@ comonand-diag₂ {U , X , α} = refl , ext-set (λ {a} → cond {a})
   aux {[]} = refl
   aux {triv :: a} rewrite aux {a} = refl
 
+cart-ar-□ : {A B C : Obj⊤}
+  → (f : Hom (□ₒ (toObj C)) (□ₒ (toObj A)))
+  → (g : Hom (□ₒ (toObj C)) (□ₒ (toObj B)))
+  → Hom (□ₒ (toObj C)) ((□ₒ (toObj A)) ⊗ₒ (□ₒ (toObj B)))
+cart-ar-□ {U , α}{V , β}{W , γ} (f , F , p₁) (g , G , p₂) = trans-× f g ,  {!!} , {!!}
+ where
+   
+-}

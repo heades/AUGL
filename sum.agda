@@ -5,6 +5,7 @@ open import bool
 open import eq
 open import maybe
 open import product
+open import empty
 
 ----------------------------------------------------------------------
 -- datatypes
@@ -65,3 +66,35 @@ extract-inj₂≡ refl = refl
 ≡⊎-to-= eqa eqb dropa dropb (inj₂ b) (inj₂ b') p = dropb b b' (extract-inj₂≡ p)
 ≡⊎-to-= eqa eqb dropa dropb (inj₁ a) (inj₂ b) ()
 ≡⊎-to-= eqa eqb dropa dropb (inj₂ b) (inj₁ a) ()
+
+⊎-assoc : ∀{ℓ}{U V W : Set ℓ} → U ⊎ V ⊎ W → (U ⊎ V) ⊎ W
+⊎-assoc (inj₁ x) = inj₁ (inj₁ x)
+⊎-assoc (inj₂ (inj₁ x)) = inj₁ (inj₂ x)
+⊎-assoc (inj₂ (inj₂ y)) = inj₂ y
+
+⊎-assoc-inv : ∀{ℓ}{U V W : Set ℓ} → (U ⊎ V) ⊎ W → U ⊎ V ⊎ W
+⊎-assoc-inv (inj₁ (inj₁ x)) = inj₁ x
+⊎-assoc-inv (inj₁ (inj₂ y)) = inj₂ (inj₁ y)
+⊎-assoc-inv (inj₂ y) = inj₂ (inj₂ y)
+
+⊎-ar : ∀{ℓ}{U V W : Set ℓ} → (U → W) → (V → W) → U ⊎ V → W
+⊎-ar f g (inj₁ x) = f x
+⊎-ar f g (inj₂ y) = g y
+
+⊎-sym : ∀{ℓ}{X Y : Set ℓ} → X ⊎ Y → Y ⊎ X
+⊎-sym (inj₁ x) = inj₂ x
+⊎-sym (inj₂ y) = inj₁ y
+
+⊎-left-ident : ∀{ℓ}{X : Set ℓ} → ⊥ {ℓ} ⊎ X → X
+⊎-left-ident (inj₁ x) = ⊥-elim x
+⊎-left-ident (inj₂ y) = y
+
+⊎-left-ident-inv : ∀{ℓ}{X : Set ℓ} → X → ⊥ {ℓ} ⊎ X 
+⊎-left-ident-inv = inj₂
+
+⊎-right-ident : ∀{ℓ}{X : Set ℓ} → X ⊎ ⊥ {ℓ} → X
+⊎-right-ident (inj₁ x) = x
+⊎-right-ident (inj₂ y) = ⊥-elim y
+
+⊎-right-ident-inv : ∀{ℓ}{X : Set ℓ} → X → X ⊎ ⊥ {ℓ} 
+⊎-right-ident-inv = inj₁
