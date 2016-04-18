@@ -258,10 +258,10 @@ iszeromult (suc x) (suc y) p q = refl
 <-trans {suc x} {suc y} {0} p1 () 
 <-trans {suc x} {suc y} {suc z} p1 p2 = <-trans {x} {y} {z} p1 p2
 
-<≤-trans : ∀ {x y z : ℕ} → x < y ≡ tt → y ≤ z ≡ tt → x < z ≡ tt
-<≤-trans {x} {y} {z} p1 p2 with ||-split p2
-... | inj₁ p' = <-trans{x}  p1 p'
-... | inj₂ p' rewrite =ℕ-to-≡ {y} {z} p' = p1
+-- <≤-trans : ∀ {x y z : ℕ} → x < y ≡ tt → y ≤ z ≡ tt → x < z ≡ tt
+-- <≤-trans {x} {y} {z} p1 p2 with ||-split p2
+-- ... | inj₁ p' = <-trans{x}  p1 p'
+-- ... | inj₂ p' rewrite =ℕ-to-≡ {y} {z} p' = p1
 
 ≤<-trans : ∀ {x y z : ℕ} → x ≤ y ≡ tt → y < z ≡ tt → x < z ≡ tt
 ≤<-trans {x} {y} {z} p1 p2 with ||-split p1
@@ -282,8 +282,8 @@ iszeromult (suc x) (suc y) p q = refl
 suc≤ : ∀ {n n' : ℕ} → suc n ≤ suc n' ≡ tt → n ≤ n' ≡ tt
 suc≤{n}{n'} p = p
 
-suc≤< : ∀ {n n' : ℕ} → suc n ≤ n' ≡ tt → n < n' ≡ tt
-suc≤<{n} p = <≤-trans{n} (<-suc n) p 
+-- suc≤< : ∀ {n n' : ℕ} → suc n ≤ n' ≡ tt → n < n' ≡ tt
+-- suc≤<{n} p = <≤-trans{n} (<-suc n) p 
 
 suc<< : ∀ {n' n : ℕ} → suc n < n' ≡ tt → n < n' ≡ tt
 suc<<{n = n} p = <-trans{n} (<-suc n) p 

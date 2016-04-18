@@ -5,19 +5,19 @@ open import eq
 open import product
 open import sum
 
-ff-imp : ∀ (b : 𝔹) → ff imp b ≡ tt
+ff-imp : ∀ (b : 𝔹) → (ff imp b) ≡ tt
 ff-imp ff = refl
 ff-imp tt = refl
 
-imp-tt : ∀ (b : 𝔹) → b imp tt ≡ tt
+imp-tt : ∀ (b : 𝔹) → (b imp tt) ≡ tt
 imp-tt ff = refl
 imp-tt tt = refl
 
-imp-ff : ∀ (b : 𝔹) → b imp ff ≡ ~ b
+imp-ff : ∀ (b : 𝔹) → (b imp ff) ≡ ~ b
 imp-ff tt = refl
 imp-ff ff = refl
 
-tt-imp : ∀ (b : 𝔹) → tt imp b ≡ b
+tt-imp : ∀ (b : 𝔹) → (tt imp b) ≡ b
 tt-imp tt = refl
 tt-imp ff = refl
 
@@ -138,7 +138,7 @@ ite-cong₃ b x refl = refl
 -----------------------------------
 -- Theorems about imp
 -----------------------------------
-imp-same : ∀ (b : 𝔹) → b imp b ≡ tt
+imp-same : ∀ (b : 𝔹) → (b imp b) ≡ tt
 imp-same ff = refl
 imp-same tt = refl
 
@@ -146,13 +146,13 @@ imp-to-|| : ∀ (b1 b2 : 𝔹) → (b1 imp b2) ≡ (~ b1 || b2)
 imp-to-|| ff _ = refl
 imp-to-|| tt _ = refl
 
-imp-mp : ∀ {b b' : 𝔹} → b imp b' ≡ tt → b ≡ tt → b' ≡ tt 
+imp-mp : ∀ {b b' : 𝔹} → (b imp b') ≡ tt → b ≡ tt → b' ≡ tt 
 imp-mp {tt} {tt} p refl = refl
 imp-mp {ff} {ff} p q = q
 imp-mp {tt} {ff} p q = p
 imp-mp {ff} {tt} p q = refl
 
-imp-antisymm : ∀ {b1 b2 : 𝔹} → b1 imp b2 ≡ tt → b2 imp b1 ≡ tt → b1 ≡ b2
+imp-antisymm : ∀ {b1 b2 : 𝔹} → (b1 imp b2) ≡ tt → (b2 imp b1) ≡ tt → b1 ≡ b2
 imp-antisymm{tt}{tt} p q = refl
 imp-antisymm{tt}{ff} () q 
 imp-antisymm{ff}{tt} p ()

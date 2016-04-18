@@ -100,7 +100,7 @@ _⊗ₐ_ {(U , X , α)}{(V , Y , β)}{(W , Z , γ)}{(S , T , δ)} (f , F , p₁)
   p {(u , v)} {(h₁ , h₂)} (p-α , p-β) = p₁ p-α , p₂ p-β
 
 -- The unit for tensor:
-ι : ⊤ → ⊤ → Set
+ι : ⊤ {lzero} → ⊤ {lzero} → Set
 ι triv triv = ⊤
 
 I : Obj

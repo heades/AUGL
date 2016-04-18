@@ -101,43 +101,43 @@ data _↝vc_ : varcomb → varcomb → Set where
   ↝Cong1 : {a a' : varcomb} (b : varcomb) → a ↝vc a' → (app a b) ↝vc (app a' b)
   ↝Cong2 : (a : varcomb) {b b' : varcomb} → b ↝vc b' → (app a b) ↝vc (app a b')
 
-open closures.basics _↝vc_
+-- open closures.basics _↝vc_
 
-_↝vc+_ : varcomb → varcomb → Set
-_↝vc+_ = tc 
+-- _↝vc+_ : varcomb → varcomb → Set
+-- _↝vc+_ = tc 
 
-id↝ : ∀ (a : varcomb) → app (app (app S K) K) a ↝vc+ a
-id↝ a = (tc-trans (tc-step (↝S K K a)) (tc-step (↝K a (app K a))))
+-- id↝ : ∀ (a : varcomb) → app (app (app S K) K) a ↝vc+ a
+-- id↝ a = (tc-trans (tc-step (↝S K K a)) (tc-step (↝K a (app K a))))
 
-trans-Cong1 : ∀{a a' : varcomb} (b : varcomb) → a ↝vc+ a' → (app a b) ↝vc+ (app a' b)
-trans-Cong1 b (tc-trans d1 d2) = (tc-trans (trans-Cong1 b d1) (trans-Cong1 b d2))
-trans-Cong1 b (tc-step d) = tc-step (↝Cong1 b d)
+-- trans-Cong1 : ∀{a a' : varcomb} (b : varcomb) → a ↝vc+ a' → (app a b) ↝vc+ (app a' b)
+-- trans-Cong1 b (tc-trans d1 d2) = (tc-trans (trans-Cong1 b d1) (trans-Cong1 b d2))
+-- trans-Cong1 b (tc-step d) = tc-step (↝Cong1 b d)
 
-trans-Cong2 : ∀(a : varcomb) {b b' : varcomb} → b ↝vc+ b' → (app a b) ↝vc+ (app a b')
-trans-Cong2 a (tc-trans d1 d2) = (tc-trans (trans-Cong2 a d1) (trans-Cong2 a d2))
-trans-Cong2 a (tc-step d) = tc-step (↝Cong2 a d)
+-- trans-Cong2 : ∀(a : varcomb) {b b' : varcomb} → b ↝vc+ b' → (app a b) ↝vc+ (app a b')
+-- trans-Cong2 a (tc-trans d1 d2) = (tc-trans (trans-Cong2 a d1) (trans-Cong2 a d2))
+-- trans-Cong2 a (tc-step d) = tc-step (↝Cong2 a d)
 
-contains-var : string → varcomb → 𝔹
-contains-var s S = ff
-contains-var s K = ff
-contains-var s (app c1 c2) = contains-var s c1 || contains-var s c2
-contains-var s (var s') = s =string s'
+-- contains-var : string → varcomb → 𝔹
+-- contains-var s S = ff
+-- contains-var s K = ff
+-- contains-var s (app c1 c2) = contains-var s c1 || contains-var s c2
+-- contains-var s (var s') = s =string s'
 
-λ*-binds : ∀(s : string)(v : varcomb) → contains-var s (λ* s v) ≡ ff
-λ*-binds s S = refl
-λ*-binds s K = refl
-λ*-binds s (app c1 c2) rewrite λ*-binds s c1 | λ*-binds s c2 = refl
-λ*-binds s (var s') with keep (s =string s')
-λ*-binds s (var s') | tt , p rewrite p = refl
-λ*-binds s (var s') | ff , p rewrite p = p
+-- λ*-binds : ∀(s : string)(v : varcomb) → contains-var s (λ* s v) ≡ ff
+-- λ*-binds s S = refl
+-- λ*-binds s K = refl
+-- λ*-binds s (app c1 c2) rewrite λ*-binds s c1 | λ*-binds s c2 = refl
+-- λ*-binds s (var s') with keep (s =string s')
+-- λ*-binds s (var s') | tt , p rewrite p = refl
+-- λ*-binds s (var s') | ff , p rewrite p = p
 
-λ*-↝ : ∀ (v1 v2 : varcomb)(s : string) → (app (λ* s v1) v2) ↝vc+ (subst v2 s v1)
-λ*-↝ S v2 s = tc-step (↝K S v2)
-λ*-↝ K v2 s = tc-step (↝K K v2)
-λ*-↝ (app c1 c2) v2 s = 
-  (tc-trans (tc-step (↝S (λ* s c1) (λ* s c2) v2))
-  (tc-trans (trans-Cong1 (app (λ* s c2) v2) (λ*-↝ c1 v2 s))
-    (trans-Cong2 (subst v2 s c1) (λ*-↝ c2 v2 s))))
-λ*-↝ (var s') v2 s with s =string s'
-λ*-↝ (var s') v2 s | tt = id↝ v2
-λ*-↝ (var s') v2 s | ff = tc-step (↝K (var s') v2)
+-- λ*-↝ : ∀ (v1 v2 : varcomb)(s : string) → (app (λ* s v1) v2) ↝vc+ (subst v2 s v1)
+-- λ*-↝ S v2 s = tc-step (↝K S v2)
+-- λ*-↝ K v2 s = tc-step (↝K K v2)
+-- λ*-↝ (app c1 c2) v2 s = 
+--   (tc-trans (tc-step (↝S (λ* s c1) (λ* s c2) v2))
+--   (tc-trans (trans-Cong1 (app (λ* s c2) v2) (λ*-↝ c1 v2 s))
+--     (trans-Cong2 (subst v2 s c1) (λ*-↝ c2 v2 s))))
+-- λ*-↝ (var s') v2 s with s =string s'
+-- λ*-↝ (var s') v2 s | tt = id↝ v2
+-- λ*-↝ (var s') v2 s | ff = tc-step (↝K (var s') v2)

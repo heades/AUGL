@@ -19,7 +19,7 @@ postulate ext-set : ∀{l1 l2 : level} → extensionality {l1} {l2}
 -- These are isomorphisms, but Agda has no way to prove these as
 -- equivalences.  They are consistent to adopt as equivalences by
 -- univalence:
-postulate ∧-unit : ∀{ℓ}{A : Set ℓ} → A ≡ (⊤ ∧ A)
+postulate ∧-unit : ∀{ℓ}{A : Set ℓ} → A ≡ (⊤ {ℓ} ∧ A)
 postulate ∧-assoc : ∀{ℓ}{A B C : Set ℓ} →  (A ∧ (B ∧ C)) ≡ ((A ∧ B) ∧ C)
 postulate ∧-twist : ∀{ℓ}{A B : Set ℓ} →  (A ∧ B) ≡ (B ∧ A)
 -- Provable from the above axioms:
@@ -29,13 +29,4 @@ postulate assoc-twist₁ : {A B C D : Set} → ((A × C) × (B × D)) ≡ ((A ×
 _* = 𝕃
 
 postulate *-comm : ∀{A : Set}{l₁ l₂ : A *} → l₁ ++ l₂ ≡ l₂ ++ l₁
-
-×-⊥₁ : (⊥ × ⊥) → ⊥
-×-⊥₁ (x , y) = x
-
-tar⊥-× : {A B : Set}
-  → (f : A -> ⊥)
-  → (g : B → ⊥)
-  → (A × B) → ⊥
-tar⊥-× f g (a , b) = ×-⊥₁ ((f a , g b))       
 

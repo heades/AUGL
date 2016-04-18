@@ -22,10 +22,10 @@ _+a_ : ℕ → ℕ → ℕ
 +a0 0 = refl
 +a0 (suc y) = refl
 
-8-div-3-lem : 8 ÷ 3 !! refl ≡ 2 , 2
+8-div-3-lem : (8 ÷ 3 !! refl) ≡ (2 , 2)
 8-div-3-lem = refl
 
-23-div-5-lem : 23 ÷ 5 !! refl ≡ 4 , 3 
+23-div-5-lem : (23 ÷ 5 !! refl) ≡ (4 , 3)
 23-div-5-lem = refl
 
 ℕ-to-string-lem : ℕ-to-string 237 ≡ "237"

@@ -199,6 +199,12 @@ unzip [] = ([] , [])
 unzip ((x , y) :: ps) with unzip ps
 ... | (xs , ys) = x :: xs , y :: ys
 
+inPairListFst : {A B : Set} → (A → A → 𝔹) → A → 𝕃 (A ∧ B) → Set
+inPairListFst _ w [] = ⊥
+inPairListFst _=A_ w ((a , b) :: c) with w =A a
+... | tt = ⊤
+... | ff = inPairListFst _=A_ w c
+
 map-⊎ : {ℓ₁ ℓ₂ ℓ₃ : Level} → {A : Set ℓ₁}{B : Set ℓ₂}{C : Set ℓ₃} → (A → C) → (B → C) → 𝕃 (A ⊎ B) → 𝕃 C
 map-⊎ f g [] = []
 map-⊎ f g (inj₁ x :: l) = f x :: map-⊎ f g l
