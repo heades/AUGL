@@ -28,6 +28,9 @@ eq-× : ∀{ℓ₁ ℓ₂}{A : Set ℓ₁}{B : Set ℓ₂}{a a' : A}{b b' : B}
   → (a , b) ≡ (a' , b')
 eq-× refl refl = refl
 
+twist-×-iso : ∀{ℓ : level}{U V : Set ℓ}{a : U × V} → (twist-× ∘ twist-×) a ≡ id a
+twist-×-iso {a  = u , v} = refl
+
 -- This module proves typical isomorphisms about ∧.
 module ∧-Isos where
   postulate ext-set : ∀{l1 l2 : level} → extensionality {l1} {l2}
@@ -64,3 +67,5 @@ module ∧-Isos where
 
     aux₂ : {a : (A ∧ B) ∧ C} → ∧-assoc₁ (∧-assoc₂ a) ≡ a
     aux₂ {(a , b) , c} = refl
+
+

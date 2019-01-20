@@ -16,7 +16,7 @@ f ∘ g = λ x → f (g x)
 ∘-assoc f g h = refl
 
 id : ∀{ℓ}{A : Set ℓ} → A → A
-id = λ x → x
+id x = x
 
 ∘-id : ∀{ℓ ℓ'}{A : Set ℓ}{B : Set ℓ'}(f : A → B) → f ∘ id ≡ f
 ∘-id f = refl
@@ -40,3 +40,6 @@ curry f x y = f (x , y)
 
 uncurry : ∀{ℓ₁ ℓ₂ ℓ₃}{A : Set ℓ₁}{B : Set ℓ₂}{C : Set ℓ₃} → (A → B → C) → ((A × B) → C)
 uncurry f (x , y) = f x y
+
+compose-cong : ∀{ℓ}{A : Set ℓ}{B : Set ℓ}{C : Set ℓ}{f f' : A → B}{g g' : B → C} → f ≡ f' → g ≡ g' → g ∘ f ≡ g' ∘ f'
+compose-cong refl refl = refl

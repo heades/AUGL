@@ -5,7 +5,8 @@ open import bool
 open import eq
 open import maybe
 open import product
-open import empty
+open import functions
+open import empty public
 
 ----------------------------------------------------------------------
 -- datatypes
@@ -98,3 +99,43 @@ extract-inj₂≡ refl = refl
 
 ⊎-right-ident-inv : ∀{ℓ}{X : Set ℓ} → X → X ⊎ ⊥ {ℓ} 
 ⊎-right-ident-inv = inj₁
+
+⊎-map : {U W V R : Set} → (U → V) → (W → R) → U ⊎ W → V ⊎ R
+⊎-map {U} {W} {V} {R} f g (inj₁ u) = inj₁ (f u)
+⊎-map {U} {W} {V} {R} f g (inj₂ w) = inj₂ (g w)
+
+⊎-×-distl : {U V W : Set} → U × (V ⊎ W) → U × V ⊎ U × W
+⊎-×-distl {U} {V} {W} (u , inj₁ v) = inj₁ (u , v)
+⊎-×-distl {U} {V} {W} (u , inj₂ w) = inj₂ (u , w)
+
+⊎-×-distl-inv : {X Y Z : Set} → X × Y ⊎ X × Z → X × (Y ⊎ Z)
+⊎-×-distl-inv {X} {Y} {Z} (inj₁ (x , y)) = x , inj₁ y
+⊎-×-distl-inv {X} {Y} {Z} (inj₂ (x , z)) = x , inj₂ z
+
+⊎-×-distl-iso₁ : ∀{U V W}{a : U × (V ⊎ W)} → (⊎-×-distl-inv ∘ ⊎-×-distl) a ≡ id a
+⊎-×-distl-iso₁ {a = u , inj₁ v} = refl
+⊎-×-distl-iso₁ {a = u , inj₂ w} = refl
+
+⊎-×-distl-iso₂ : ∀{U V W}{a : U × V ⊎ U × W} → (⊎-×-distl ∘ ⊎-×-distl-inv) a ≡ id a
+⊎-×-distl-iso₂ {a = inj₁ (u , v)} = refl
+⊎-×-distl-iso₂ {a = inj₂ (u , w)} = refl
+
+⊎-×-distr : {U V W : Set} → (U ⊎ V) × W → U × W ⊎ V × W
+⊎-×-distr {U} {V} {W} (inj₁ u , w) = inj₁ (u , w)
+⊎-×-distr {U} {V} {W} (inj₂ v , w) = inj₂ (v , w)
+
+⊎-×-distr-inv : {X Z Y : Set} → X × Z ⊎ Y × Z → (X ⊎ Y) × Z
+⊎-×-distr-inv {X} {Z} {Y} (inj₁ (x , z)) = inj₁ x , z
+⊎-×-distr-inv {X} {Z} {Y} (inj₂ (y , z)) = inj₂ y , z
+
+⊎-×-distr-iso₁ : ∀{U V W}{a : (U ⊎ V) × W} → (⊎-×-distr-inv ∘ ⊎-×-distr) a ≡ id a
+⊎-×-distr-iso₁ {a = inj₁ u , w} = refl
+⊎-×-distr-iso₁ {a = inj₂ v , w} = refl
+
+⊎-×-distr-iso₂ : ∀{U V W}{a : (U × W) ⊎ (V × W)} → (⊎-×-distr ∘ ⊎-×-distr-inv) a ≡ id a
+⊎-×-distr-iso₂ {a = inj₁ (u , w)} = refl
+⊎-×-distr-iso₂ {a = inj₂ (v , w)} = refl
+
+⊎-codiag : ∀{ℓ : level}{U : Set ℓ} → U ⊎ U → U
+⊎-codiag (inj₁ x) = x
+⊎-codiag (inj₂ y) = y

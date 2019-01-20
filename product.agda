@@ -1,6 +1,7 @@
 module product where
 
 open import level
+open import unit public
 
 ----------------------------------------------------------------------
 -- types
@@ -78,6 +79,12 @@ lr-assoc-× : ∀{ℓ₁ ℓ₂ ℓ₃}
            → (A × B) × C
            → A × (B × C)
 lr-assoc-× ((a , b) , c) = (a , b , c)
+
+func-× : ∀{ℓ₁ ℓ₂ ℓ₃ ℓ₄}{A : Set ℓ₁}{B : Set ℓ₂}{C : Set ℓ₃}{D : Set ℓ₄} → (A → C) → (B → D) → (A × B) → (C × D)
+func-× f g (x , y) = (f x , g y)
+
+×-diag : ∀{ℓ}{X : Set ℓ} → X → X × X
+×-diag x = (x , x)
 
 ----------------------------------------------------------------------
 -- some logical notation

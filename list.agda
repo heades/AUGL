@@ -19,8 +19,7 @@ data 𝕃 {ℓ} (A : Set ℓ) : Set ℓ where
   _::_ : (x : A) (xs : 𝕃 A) → 𝕃 A
 
 {-# BUILTIN LIST 𝕃 #-}
-{-# BUILTIN NIL  []   #-}
-{-# BUILTIN CONS _::_  #-}
+{-# COMPILE GHC 𝕃 = data [] ([] | (:)) #-}
 
 list = 𝕃
 
@@ -224,3 +223,9 @@ drop-nothing : ∀{ℓ}{A : Set ℓ} → 𝕃 (maybe A) → 𝕃 A
 drop-nothing [] = []
 drop-nothing (nothing :: aa) = drop-nothing aa
 drop-nothing (just a :: aa) = a :: drop-nothing aa
+
+index : ∀{ℓ}{A : Set ℓ} → A → (A → A → 𝔹) → ℕ → 𝕃 A → maybe ℕ
+index x _ c [] = nothing
+index x _eq_ c (y :: l) with x eq y
+... | tt = just c
+... | ff = index x _eq_ (suc c) l
