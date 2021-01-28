@@ -9,6 +9,8 @@ open import neq
 open import product
 open import product-thms
 open import sum
+open import level
+open import negation
 
 --------------------------------------------------
 -- properties of addition
@@ -620,3 +622,15 @@ even~odd zero = refl
 even~odd (suc x) = odd~even x
 odd~even zero = refl
 odd~even (suc x) = even~odd x
+
+suc-eq : ∀{x y} → suc x ≡ suc y → x ≡ y
+suc-eq refl = refl
+
+suc-eq⊥ : ∀{x y} → ¬ (x ≡ y) → ¬ (suc x ≡ suc y)
+suc-eq⊥ p refl = p refl
+
+zero-suc-eq⊥ : ∀{x} → zero ≡ suc x → ⊥ {lzero}
+zero-suc-eq⊥ ()
+
+suc-zero-eq⊥ : ∀{x} → suc x ≡ zero → ⊥ {lzero}
+suc-zero-eq⊥ ()

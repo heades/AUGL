@@ -5,6 +5,7 @@ open import sum
 open import list
 open import product
 open import empty
+open import negation
 
 inj₁-inj : ∀{ℓ ℓ'}{A : Set ℓ}{B : Set ℓ'}{x : A}{x'} → inj₁{ℓ}{ℓ'}{A}{B} x ≡ inj₁ x' → x ≡ x'
 inj₁-inj refl = refl
@@ -33,3 +34,5 @@ inj₁-inj refl = refl
 ⊎-right-ident-iso₂ : ∀{ℓ}{X : Set ℓ}{x} → ⊎-right-ident {_}{X} (⊎-right-ident-inv x) ≡ x
 ⊎-right-ident-iso₂ = refl
 
+¬⊎→× : ∀{ℓ}{A B : Set ℓ} → ¬ (_⊎_ {ℓ} A B) → ¬ A × ¬ B
+¬⊎→× {ℓ}{A}{B} p = (λ x → p (inj₁ x)) , λ x → p (inj₂ x)

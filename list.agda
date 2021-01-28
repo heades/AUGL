@@ -113,6 +113,12 @@ list-member eq a (x :: xs) with eq a x
 ... | tt = tt
 ... | ff = list-member eq a xs
 
+list-member-prop : ∀{ℓ}{A : Set ℓ}(eq : A → A → 𝔹)(a : A)(l : 𝕃 A) → Set
+list-member-prop eq a [] = ⊥
+list-member-prop eq a (x :: xs) with eq a x
+... | tt = ⊤
+... | ff = list-member-prop eq a xs
+
 list-minus : ∀{ℓ}{A : Set ℓ}(eq : A → A → 𝔹)(l1 l2 : 𝕃 A) → 𝕃 A
 list-minus eq [] l2 = []
 list-minus eq (x :: xs) l2 = 

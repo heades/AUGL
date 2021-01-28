@@ -1,0 +1,5 @@
+module triple where
+
+
+
+    

@@ -2,6 +2,8 @@ module nat where
 
 open import product
 open import bool
+open import maybe
+open import eq
 
 ----------------------------------------------------------------------
 -- datatypes
